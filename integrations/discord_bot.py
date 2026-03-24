@@ -27,6 +27,52 @@ intents.message_content = True
 bot = commands.Bot(command_prefix="/", intents=intents)
 
 
+def _format_validation_block(proposal: dict) -> str:
+    validation = proposal.get("validation") or {}
+    is_valid = validation.get("is_valid", True)
+    errors = validation.get("errors", [])
+    warnings = validation.get("warnings", [])
+
+    lines = []
+
+    if is_valid:
+        if warnings:
+            lines.append(f"Validation: passed with {len(warnings)} warning(s)")
+        else:
+            lines.append("Validation: passed")
+    else:
+        lines.append("Validation: failed")
+
+    if errors:
+        lines.append("Errors:")
+        for err in errors:
+            lines.append(f"- {err}")
+
+    if warnings:
+        lines.append("Warnings:")
+        for warn in warnings:
+            lines.append(f"- {warn}")
+
+    return "\n".join(lines)
+
+
+def _format_proposal_line(proposal: dict) -> str:
+    validation = proposal.get("validation") or {}
+    warnings = validation.get("warnings", [])
+    errors = validation.get("errors", [])
+
+    validation_suffix = ""
+    if errors:
+        validation_suffix = f" | validation failed ({len(errors)} error(s))"
+    elif warnings:
+        validation_suffix = f" | {len(warnings)} warning(s)"
+
+    return (
+        f"#{proposal['id']} | task {proposal['task_id']} | "
+        f"[{proposal['status']}] {proposal['summary']}{validation_suffix}"
+    )
+
+
 @bot.event
 async def on_ready():
     set_bot_instance(bot)
@@ -106,6 +152,16 @@ async def approve(ctx, proposal_id: int):
         await ctx.send(f"Proposal `{proposal_id}` is not pending.")
         return
 
+    validation = proposal.get("validation") or {}
+    is_valid = validation.get("is_valid", True)
+
+    if not is_valid:
+        await ctx.send(
+            f"Proposal `{proposal_id}` cannot be approved because validation failed.\n\n"
+            f"{_format_validation_block(proposal)}"
+        )
+        return
+
     backup_path = apply_proposal_file(
         proposal["file_path"],
         proposal["new_content"]
@@ -120,10 +176,13 @@ async def approve(ctx, proposal_id: int):
 
     update_proposal_status(proposal_id, "applied")
 
+    validation_text = _format_validation_block(proposal)
+
     await ctx.send(
         f"Approved and applied proposal `{proposal_id}`.\n"
         f"File: {proposal['file_path']}\n"
-        f"Backup: {backup_path if backup_path else 'not needed'}"
+        f"Backup: {backup_path if backup_path else 'not needed'}\n\n"
+        f"{validation_text}"
     )
 
 
@@ -154,11 +213,30 @@ async def proposals(ctx, status: str = None):
 
     lines = []
     for p in items[-10:]:
-        lines.append(
-            f"#{p['id']} | task {p['task_id']} | [{p['status']}] {p['summary']}"
-        )
+        lines.append(_format_proposal_line(p))
 
     await ctx.send("\n".join(lines))
+
+
+@bot.command(name="proposal")
+async def proposal(ctx, proposal_id: int):
+    proposal = get_proposal(proposal_id)
+
+    if proposal is None:
+        await ctx.send(f"Proposal `{proposal_id}` not found.")
+        return
+
+    validation_text = _format_validation_block(proposal)
+
+    await ctx.send(
+        f"Proposal #{proposal['id']}\n"
+        f"Task ID: {proposal['task_id']}\n"
+        f"Project: {proposal['project_id']}\n"
+        f"File: {proposal['file_path']}\n"
+        f"Status: {proposal['status']}\n"
+        f"Summary: {proposal['summary']}\n\n"
+        f"{validation_text}"
+    )
 
 
 def run_bot():
