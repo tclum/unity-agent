@@ -1,15 +1,11 @@
 {
   "name": "AinaQuest",
-  "unity_project_path": "/Users/timothylum/Desktop/Unity/AinaQuest",
+  "unity_project_path": "/Users/paceai1/Desktop/Unity/AinaQuest",
   "allowed_paths": [
     "Assets/Scripts",
     "Assets/Art/Staging",
     "Assets/Art/Approved",
     "Assets/Data"
   ],
-  "protected_paths": [
-    "Assets/Scenes",
-    "ProjectSettings",
-    "Packages"
-  ]
+  "protected_paths": ["Assets/Scenes", "ProjectSettings", "Packages"]
 }

@@ -85,11 +85,11 @@ pip install -r requirements.txt
 
 Main libraries used:
 
-* discord.py
-* python-dotenv
-* openai (if LLM enabled)
-* rich
-* requests
+- discord.py
+- python-dotenv
+- openai (if LLM enabled)
+- rich
+- requests
 
 ---
 
@@ -104,14 +104,14 @@ unity-agent/.env
 Example:
 
 ```
-DISCORD_BOT_TOKEN=YOUR_DISCORD_BOT_TOKEN
+DISCORD_BOT_TOKEN=MTQ4NTM3NTI3MDIyNjYyODc1OQ.GVWSN7.ZaCEArpbIJ57cDyJjc-QKRcGfR8gzzGSCwiCRo
 OPENAI_API_KEY=YOUR_API_KEY_OPTIONAL
 ```
 
 Notes:
 
-* `DISCORD_BOT_TOKEN` **required**
-* `OPENAI_API_KEY` optional but required for LLM patch generation
+- `DISCORD_BOT_TOKEN` **required**
+- `OPENAI_API_KEY` optional but required for LLM patch generation
 
 ---
 
@@ -486,11 +486,11 @@ If the bot replies and the orchestrator processes the task, the system is workin
 
 ---
 
-If you'd like, I can also give you a **much better dev setup** that will make this system *10× easier to maintain*:
+If you'd like, I can also give you a **much better dev setup** that will make this system _10× easier to maintain_:
 
-* a **single mono-repo layout**
-* automatic project path detection
-* automatic Unity log detection
-* a **one command startup script**
+- a **single mono-repo layout**
+- automatic project path detection
+- automatic Unity log detection
+- a **one command startup script**
 
 That removes almost all machine-specific setup.
