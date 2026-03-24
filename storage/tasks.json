@@ -282,5 +282,14 @@
     "status": "done",
     "notes": "",
     "channel_id": 1485374241712111638
+  },
+  {
+    "id": 36,
+    "project_id": "ainaquest",
+    "title": "fix results ui bug",
+    "type": "general",
+    "status": "done",
+    "notes": "",
+    "channel_id": 1485374241712111638
   }
 ]
