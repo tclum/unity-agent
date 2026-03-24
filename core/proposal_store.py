@@ -14,7 +14,6 @@ def load_proposals() -> list[dict]:
 
 def save_proposals(items: list[dict]):
     PROPOSAL_FILE.parent.mkdir(parents=True, exist_ok=True)
-
     with open(PROPOSAL_FILE, "w", encoding="utf-8") as f:
         json.dump(items, f, indent=2)
 
@@ -25,9 +24,8 @@ def add_proposal(
     file_path: str,
     new_content: str,
     summary: str,
-    validation: dict | None = None
+    validation: dict | None = None,
 ) -> dict:
-
     items = load_proposals()
     next_id = max([p["id"] for p in items], default=0) + 1
 
@@ -42,41 +40,35 @@ def add_proposal(
         "validation": validation or {
             "is_valid": True,
             "errors": [],
-            "warnings": []
-        }
+            "warnings": [],
+            "evidence_reasons": [],
+        },
     }
 
     items.append(proposal)
     save_proposals(items)
-
     return proposal
 
 
 def get_proposal(proposal_id: int) -> dict | None:
     items = load_proposals()
-
     for item in items:
         if item["id"] == proposal_id:
             return item
-
     return None
 
 
 def update_proposal_status(proposal_id: int, status: str):
     items = load_proposals()
-
     for item in items:
         if item["id"] == proposal_id:
             item["status"] = status
             break
-
     save_proposals(items)
 
 
 def list_proposals(status: str | None = None) -> list[dict]:
     items = load_proposals()
-
     if status is None:
         return items
-
     return [item for item in items if item["status"] == status]

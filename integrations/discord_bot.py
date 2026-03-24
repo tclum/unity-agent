@@ -32,6 +32,7 @@ def _format_validation_block(proposal: dict) -> str:
     is_valid = validation.get("is_valid", True)
     errors = validation.get("errors", [])
     warnings = validation.get("warnings", [])
+    evidence_reasons = validation.get("evidence_reasons", [])
 
     lines = []
 
@@ -42,6 +43,11 @@ def _format_validation_block(proposal: dict) -> str:
             lines.append("Validation: passed")
     else:
         lines.append("Validation: failed")
+
+    if evidence_reasons:
+        lines.append("Evidence:")
+        for reason in evidence_reasons:
+            lines.append(f"- {reason}")
 
     if errors:
         lines.append("Errors:")
@@ -54,7 +60,6 @@ def _format_validation_block(proposal: dict) -> str:
             lines.append(f"- {warn}")
 
     return "\n".join(lines)
-
 
 def _format_proposal_line(proposal: dict) -> str:
     validation = proposal.get("validation") or {}
