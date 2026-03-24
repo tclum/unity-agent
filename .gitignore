@@ -1,0 +1,40 @@
+# Python
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.venv/
+venv/
+env/
+
+# Environment / secrets
+.env
+.env.*
+*.pem
+*.key
+
+# macOS
+.DS_Store
+
+# Logs
+logs/
+*.log
+
+# Generated outputs
+outputs/backups/
+outputs/logs/
+outputs/proposals/
+outputs/runtime/
+outputs/temp/
+
+# IDE
+.vscode/
+.idea/
+
+# Testing / cache
+.pytest_cache/
+.mypy_cache/
+
+# Misc
+*.tmp
+*.swp

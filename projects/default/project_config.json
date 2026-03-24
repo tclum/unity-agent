@@ -1,0 +1,14 @@
+{
+  "name": "Default Unity Project",
+  "unity_project_path": "/Users/timothylum/UnityProjects/DefaultProject",
+  "allowed_paths": [
+    "Assets/Scripts",
+    "Assets/Art/Staging",
+    "Assets/Data"
+  ],
+  "protected_paths": [
+    "Assets/Scenes",
+    "ProjectSettings",
+    "Packages"
+  ]
+}

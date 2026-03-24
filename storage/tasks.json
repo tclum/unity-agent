@@ -1,0 +1,277 @@
+[
+  {
+    "id": 1,
+    "project_id": "ainaquest",
+    "title": "fix results screen",
+    "type": "general",
+    "status": "done",
+    "notes": ""
+  },
+  {
+    "id": 2,
+    "project_id": "default",
+    "title": "fix results ui bug",
+    "type": "general",
+    "status": "done",
+    "notes": ""
+  },
+  {
+    "id": 3,
+    "project_id": "ainaquest",
+    "title": "fix results ui bug",
+    "type": "general",
+    "status": "done",
+    "notes": ""
+  },
+  {
+    "id": 4,
+    "project_id": "ainaquest",
+    "title": "fix results ui bug",
+    "type": "general",
+    "status": "done",
+    "notes": ""
+  },
+  {
+    "id": 5,
+    "project_id": "ainaquest",
+    "title": "fix results ui bug",
+    "type": "general",
+    "status": "done",
+    "notes": ""
+  },
+  {
+    "id": 6,
+    "project_id": "default",
+    "title": "fix results ui bug",
+    "type": "general",
+    "status": "done",
+    "notes": ""
+  },
+  {
+    "id": 7,
+    "project_id": "default",
+    "title": "fix results ui bug",
+    "type": "general",
+    "status": "done",
+    "notes": ""
+  },
+  {
+    "id": 8,
+    "project_id": "default",
+    "title": "fix results ui bug",
+    "type": "general",
+    "status": "done",
+    "notes": ""
+  },
+  {
+    "id": 9,
+    "project_id": "ainaquest",
+    "title": "fix results ui bug",
+    "type": "general",
+    "status": "done",
+    "notes": ""
+  },
+  {
+    "id": 10,
+    "project_id": "ainaquest",
+    "title": "fix results ui bug",
+    "type": "general",
+    "status": "done",
+    "notes": ""
+  },
+  {
+    "id": 11,
+    "project_id": "ainaquest",
+    "title": "fix results ui bug",
+    "type": "general",
+    "status": "done",
+    "notes": ""
+  },
+  {
+    "id": 12,
+    "project_id": "ainaquest",
+    "title": "fix results ui bug",
+    "type": "general",
+    "status": "done",
+    "notes": ""
+  },
+  {
+    "id": 13,
+    "project_id": "ainaquest",
+    "title": "fix results ui bug",
+    "type": "general",
+    "status": "done",
+    "notes": ""
+  },
+  {
+    "id": 14,
+    "project_id": "ainaquest",
+    "title": "fix results ui bug",
+    "type": "general",
+    "status": "done",
+    "notes": ""
+  },
+  {
+    "id": 15,
+    "project_id": "ainaquest",
+    "title": "fix results ui bug",
+    "type": "general",
+    "status": "done",
+    "notes": ""
+  },
+  {
+    "id": 16,
+    "project_id": "ainaquest",
+    "title": "fix results ui bug",
+    "type": "general",
+    "status": "done",
+    "notes": ""
+  },
+  {
+    "id": 17,
+    "project_id": "ainaquest",
+    "title": "investigate results ui inactive",
+    "type": "general",
+    "status": "done",
+    "notes": ""
+  },
+  {
+    "id": 18,
+    "project_id": "ainaquest",
+    "title": "analyze results ui logs",
+    "type": "general",
+    "status": "done",
+    "notes": ""
+  },
+  {
+    "id": 19,
+    "project_id": "ainaquest",
+    "title": "find who calls ShowResults",
+    "type": "general",
+    "status": "done",
+    "notes": ""
+  },
+  {
+    "id": 20,
+    "project_id": "ainaquest",
+    "title": "find who calls Hide",
+    "type": "general",
+    "status": "done",
+    "notes": ""
+  },
+  {
+    "id": 21,
+    "project_id": "ainaquest",
+    "title": "find where ResultsPanel is referenced",
+    "type": "general",
+    "status": "done",
+    "notes": ""
+  },
+  {
+    "id": 22,
+    "project_id": "ainaquest",
+    "title": "find where SetActive(false) is used",
+    "type": "general",
+    "status": "done",
+    "notes": ""
+  },
+  {
+    "id": 23,
+    "project_id": "ainaquest",
+    "title": "find ResultsPanel",
+    "type": "general",
+    "status": "done",
+    "notes": ""
+  },
+  {
+    "id": 24,
+    "project_id": "ainaquest",
+    "title": "find ConfirmButton",
+    "type": "general",
+    "status": "done",
+    "notes": ""
+  },
+  {
+    "id": 25,
+    "project_id": "ainaquest",
+    "title": "find TurnTransitionPanel",
+    "type": "general",
+    "status": "done",
+    "notes": ""
+  },
+  {
+    "id": 26,
+    "project_id": "ainaquest",
+    "title": "search ResultsUI in scenes",
+    "type": "general",
+    "status": "done",
+    "notes": ""
+  },
+  {
+    "id": 27,
+    "project_id": "ainaquest",
+    "title": "inspect ui cluster for ResultsUI",
+    "type": "general",
+    "status": "done",
+    "notes": ""
+  },
+  {
+    "id": 28,
+    "project_id": "ainaquest",
+    "title": "inspect ui cluster for ConfirmButton",
+    "type": "general",
+    "status": "done",
+    "notes": ""
+  },
+  {
+    "id": 29,
+    "project_id": "ainaquest",
+    "title": "inspect ui cluster for TurnTransitionPane",
+    "type": "general",
+    "status": "done",
+    "notes": ""
+  },
+  {
+    "id": 30,
+    "project_id": "ainaquest",
+    "title": "hide gameplay ui when results screen appears",
+    "type": "general",
+    "status": "done",
+    "notes": ""
+  },
+  {
+    "id": 31,
+    "project_id": "ainaquest",
+    "title": "hide gameplay ui when results screen appears",
+    "type": "general",
+    "status": "done",
+    "notes": ""
+  },
+  {
+    "id": 32,
+    "project_id": "ainaquest",
+    "title": "hide gameplay ui when results screen appears",
+    "type": "general",
+    "status": "done",
+    "notes": "",
+    "channel_id": 1485374241712111638
+  },
+  {
+    "id": 33,
+    "project_id": "ainaquest",
+    "title": "hide gameplay ui when results screen appears",
+    "type": "general",
+    "status": "done",
+    "notes": "",
+    "channel_id": 1485374241712111638
+  },
+  {
+    "id": 34,
+    "project_id": "ainaquest",
+    "title": "fix results ui bug",
+    "type": "general",
+    "status": "done",
+    "notes": "",
+    "channel_id": 1485374241712111638
+  }
+]
