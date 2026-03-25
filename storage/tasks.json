@@ -291,5 +291,59 @@
     "status": "done",
     "notes": "",
     "channel_id": 1485374241712111638
+  },
+  {
+    "id": 37,
+    "project_id": "ainaquest",
+    "title": "fix results ui bug",
+    "type": "general",
+    "status": "done",
+    "notes": "",
+    "channel_id": 1485374241712111638
+  },
+  {
+    "id": 38,
+    "project_id": "ainaquest",
+    "title": "fix results ui bug \u2014 ResultsPanel may show stale data \nwhen ShowResults() is called multiple times in a session. \nCheck ResultsUI.cs for panel state not being reset properly.",
+    "type": "general",
+    "status": "done",
+    "notes": "",
+    "channel_id": 1485374241712111638
+  },
+  {
+    "id": 39,
+    "project_id": "ainaquest",
+    "title": "fix results ui bug \u2014 ResultsPanel may show stale data \nwhen ShowResults() is called multiple times in a session. \nCheck ResultsUI.cs for panel state not being reset properly.",
+    "type": "general",
+    "status": "done",
+    "notes": "",
+    "channel_id": 1485374241712111638
+  },
+  {
+    "id": 40,
+    "project_id": "ainaquest",
+    "title": "fix results ui bug",
+    "type": "general",
+    "status": "done",
+    "notes": "",
+    "channel_id": 1485374241712111638
+  },
+  {
+    "id": 41,
+    "project_id": "ainaquest",
+    "title": "fix results ui bug",
+    "type": "general",
+    "status": "done",
+    "notes": "",
+    "channel_id": 1485374241712111638
+  },
+  {
+    "id": 42,
+    "project_id": "ainaquest",
+    "title": "fix results ui bug \u2014 the current file already has the correct fix. \nThe only remaining issue is indentation: ShowResults() method is not \nindented inside the class body. Fix indentation only, do not change logic.",
+    "type": "general",
+    "status": "done",
+    "notes": "",
+    "channel_id": 1485374241712111638
   }
 ]

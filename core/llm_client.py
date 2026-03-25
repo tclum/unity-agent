@@ -48,16 +48,45 @@ def strip_code_fences(text: str) -> str:
 def extract_json(text: str) -> str:
     """
     Extract JSON object from model output safely.
+
+    Uses a brace-depth counter rather than rfind('}') so that nested
+    braces inside string values (e.g. C# code in new_content) don't
+    fool the extractor into cutting off too early or too late.
     """
     text = strip_code_fences(text)
 
     start = text.find("{")
-    end = text.rfind("}")
-
-    if start == -1 or end == -1:
+    if start == -1:
         raise ValueError(f"No JSON object detected in LLM output:\n{text}")
 
-    return text[start:end + 1]
+    depth = 0
+    in_string = False
+    escape_next = False
+
+    for i, ch in enumerate(text[start:], start=start):
+        if escape_next:
+            escape_next = False
+            continue
+
+        if ch == "\\" and in_string:
+            escape_next = True
+            continue
+
+        if ch == '"':
+            in_string = not in_string
+            continue
+
+        if in_string:
+            continue
+
+        if ch == "{":
+            depth += 1
+        elif ch == "}":
+            depth -= 1
+            if depth == 0:
+                return text[start:i + 1]
+
+    raise ValueError(f"Unbalanced braces in LLM output:\n{text}")
 
 
 def generate_patch_proposal(
@@ -88,8 +117,9 @@ You are generating a SAFE patch proposal for a Unity C# file.
 Rules:
 - Return VALID JSON only.
 - Do NOT wrap JSON in markdown.
-- Preserve unrelated code.
-- Make the smallest safe change possible.
+- ALWAYS return the COMPLETE file in new_content — every class, method, field, and using statement must be present.
+- Never return a partial file, a single method, or a snippet. new_content must be the entire file contents.
+- Make the smallest safe change possible to fix the issue.
 - Do not invent APIs that don't exist.
 
 Your JSON must contain:
