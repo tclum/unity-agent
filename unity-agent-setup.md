@@ -104,8 +104,7 @@ unity-agent/.env
 Example:
 
 ```
-DISCORD_BOT_TOKEN=YOUR_DISCORD_TOKEN
-OPENAI_API_KEY=YOUR_API_KEY_OPTIONAL
+
 ```
 
 Notes:
