@@ -1,6 +1,13 @@
 import asyncio
+import os
+from dotenv import load_dotenv
+
+load_dotenv()
 
 BOT_INSTANCE = None
+
+# Set DISCORD_NOTIFY_CHANNEL_ID in your .env to enable proactive notifications
+_NOTIFY_CHANNEL_ID = int(os.getenv("DISCORD_NOTIFY_CHANNEL_ID", "0") or "0")
 
 
 def set_bot_instance(bot):
@@ -39,3 +46,16 @@ def send_message(channel_id: int, content: str):
         asyncio.run_coroutine_threadsafe(_send_message(channel_id, content), loop)
     except Exception as e:
         print(f"[DiscordNotifier] Failed to send message: {e}")
+
+
+def notify_discord(content: str):
+    """
+    Send a proactive notification to the default notify channel.
+    Set DISCORD_NOTIFY_CHANNEL_ID in .env to enable.
+    Falls back to printing if no channel is configured.
+    """
+    if _NOTIFY_CHANNEL_ID == 0:
+        print(f"[DiscordNotifier] (no channel configured) {content}")
+        return
+
+    send_message(_NOTIFY_CHANNEL_ID, content)

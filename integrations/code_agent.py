@@ -16,14 +16,6 @@ from core.scene_context_helper import get_scene_context_for_task
 from core.proposal_validator import validate_patch_for_file
 from core.risk_classifier import classify_risk
 from core.proposal_applier import apply_proposal_file
-from core.multi_patcher import (
-    is_multi_file_task,
-    generate_multi_file_proposal,
-    validate_multi_file_patches,
-    classify_multi_file_risk,
-    extract_named_files,
-    MAX_FILES_PER_TASK,
-)
 from integrations.git_manager import git_commit_files
 from integrations.discord_notifier import notify_discord
 
@@ -223,9 +215,6 @@ def handle_patch_proposal(task, project_config):
                 ),
             }
 
-        if result["status"] in ("error", "empty"):
-            print(f"[CodeAgent] Attempt {attempt} error detail: {result.get('message', 'unknown')}")
-
         if result["status"] in ("error", "empty") and attempt == MAX_RETRIES:
             notify_discord(
                 f"🚨 Patch failed after {MAX_RETRIES} attempts for task #{task['id']} — needs your input.\n"
@@ -397,176 +386,7 @@ def handle_hierarchy_inspection(task, project_config):
     return None
 
 
-def handle_multi_file_patch(task: dict, project_config: dict):
-    """
-    Handles tasks that require patching multiple files.
-    Gathers up to MAX_FILES_PER_TASK relevant files, generates patches
-    for all of them in one LLM call, validates each independently,
-    then routes based on combined risk level.
-    """
-    keywords = extract_keywords(task["title"])
-    files = find_relevant_files(project_config, keywords)
-
-    # Always include explicitly named scripts from the task title
-    from pathlib import Path as _Path
-    unity_root = _Path(project_config["unity_project_path"])
-    all_scripts = [str(p) for p in (unity_root / "Assets").rglob("*.cs")]
-    named = extract_named_files(task["title"], all_scripts)
-    for f in named:
-        if f not in files:
-            files.insert(0, f)
-
-    if not files:
-        print(f"[CodeAgent] Multi-file: no files found for task #{task['id']}, returning None")
-        return None
-
-    # Cap to MAX_FILES_PER_TASK
-    target_files = files[:MAX_FILES_PER_TASK]
-
-    original_contents = {}
-    for f in target_files:
-        try:
-            original_contents[f] = Path(f).read_text(encoding="utf-8")
-        except Exception:
-            pass
-
-    if not original_contents:
-        print(f"[CodeAgent] Multi-file: no file contents loaded, returning None")
-        return None
-
-    filtered_log = read_filtered_unity_log(
-        keywords=["Error", "Exception", "NullReference"] + keywords
-    )
-
-    print(f"[CodeAgent] Multi-file patch for task #{task['id']} — {len(original_contents)} files")
-
-    all_valid_patches = []
-    last_errors = []
-
-    for attempt in range(1, 4):
-        print(f"[CodeAgent] Multi-file attempt {attempt}/3")
-        try:
-            patches = generate_multi_file_proposal(
-                task_title=task["title"],
-                file_contents=original_contents,
-                filtered_log=filtered_log,
-                attempt=attempt,
-            )
-        except Exception as e:
-            last_errors = [str(e)]
-            print(f"[CodeAgent] Multi-file attempt {attempt} error: {e}")
-            continue
-
-        valid_patches, errors = validate_multi_file_patches(patches, original_contents)
-        last_errors = errors
-
-        if valid_patches:
-            all_valid_patches = valid_patches
-            break
-
-        print(f"[CodeAgent] Multi-file attempt {attempt} validation errors: {errors}")
-
-    if not all_valid_patches:
-        notify_discord(
-            f"🚨 Multi-file patch failed for task #{task['id']} — needs your input.\n"
-            f"Errors: {'; '.join(last_errors[:3])}"
-        )
-        return {
-            "changed_files": [],
-            "summary": (
-                f"Multi-file patch failed after 3 attempts.\n\n"
-                f"Target files:\n" + "\n".join(f"- {f}" for f in target_files) + "\n\n"
-                f"Errors:\n" + "\n".join(f"- {e}" for e in last_errors)
-            ),
-        }
-
-    # Classify combined risk
-    risk_level, risk_reasons = classify_multi_file_risk(all_valid_patches, original_contents)
-
-    # Store proposals and apply or queue for approval
-    proposal_ids = []
-    applied_files = []
-    summaries = []
-
-    for patch in all_valid_patches:
-        file_path = patch["file_path"]
-        new_content = patch["new_content"]
-        summary = patch.get("summary", "No summary.")
-        diagnosis = patch.get("diagnosis", "No diagnosis.")
-        validation = patch.get("validation")
-
-        proposal = add_proposal(
-            task_id=task["id"],
-            project_id=task["project_id"],
-            file_path=file_path,
-            new_content=new_content,
-            summary=summary,
-            validation={
-                "is_valid": validation.is_valid if validation else True,
-                "errors": validation.errors if validation else [],
-                "warnings": validation.warnings if validation else [],
-                "evidence_reasons": [],
-            },
-        )
-        proposal_ids.append(proposal["id"])
-        summaries.append(f"{Path(file_path).name}: {summary}")
-
-        if risk_level == "low":
-            apply_proposal_file(file_path, new_content)
-            applied_files.append(file_path)
-
-            from core.proposal_store import update_proposal_status
-            update_proposal_status(proposal["id"], "applied")
-
-    if risk_level == "low":
-        git_commit_files(
-            project_config,
-            applied_files,
-            f"agent auto-patch multi-file task #{task['id']}"
-        )
-        notify_discord(
-            f"✅ Auto-patched {len(applied_files)} file(s) (task #{task['id']})\n"
-            + "\n".join(f"- {Path(f).name}" for f in applied_files)
-        )
-        return {
-            "changed_files": applied_files,
-            "summary": (
-                f"Multi-file patch auto-applied (low risk).\n"
-                f"Task ID: {task['id']}\n"
-                f"Files patched: {len(applied_files)}\n\n"
-                + "\n".join(summaries)
-            ),
-        }
-
-    # High risk — request approval for each
-    approve_cmds = " | ".join(f"/approve {pid}" for pid in proposal_ids)
-    notify_discord(
-        f"⚠️ High-risk multi-file patch ready for task #{task['id']}\n"
-        f"Files: {', '.join(Path(p['file_path']).name for p in all_valid_patches)}\n"
-        f"Risk: {', '.join(risk_reasons[:3])}\n"
-        f"Approve all: {approve_cmds}"
-    )
-    return {
-        "changed_files": [],
-        "summary": (
-            f"Multi-file patch proposed (high risk — approval required).\n"
-            f"Task ID: {task['id']}\n"
-            f"Proposal IDs: {proposal_ids}\n\n"
-            + "\n".join(summaries) + "\n\n"
-            f"Risk reasons:\n" + "\n".join(f"- {r}" for r in risk_reasons) + "\n\n"
-            + approve_cmds
-        ),
-    }
-
-
 def handle_task(task, project_config):
-    # Route multi-file tasks first — do not fall through to single-file if handled
-    if is_multi_file_task(task["title"]):
-        multi_result = handle_multi_file_patch(task, project_config)
-        if multi_result is not None:
-            return multi_result
-        # multi_result is None only if no files were found at all — safe to fall through
-
     patch_result = handle_patch_proposal(task, project_config)
     if patch_result is not None:
         return patch_result

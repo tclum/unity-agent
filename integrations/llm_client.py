@@ -94,12 +94,10 @@ def generate_patch_proposal(
     file_path: str,
     file_content: str,
     filtered_log: str = "",
-    scene_context: str = "",
-    attempt: int = 1,
+    scene_context: str = ""
 ) -> dict:
     """
     Ask the LLM to generate a safe patch proposal for a Unity C# file.
-    Retries up to 3 times with increasingly explicit prompts.
 
     Returns:
     {
@@ -111,7 +109,7 @@ def generate_patch_proposal(
 
     client = get_client()
 
-    base_system_prompt = """
+    system_prompt = """
 You are a senior Unity engineer.
 
 You are generating a SAFE patch proposal for a Unity C# file.
@@ -122,7 +120,6 @@ Rules:
 - ALWAYS return the COMPLETE file in new_content — every class, method, field, and using statement must be present.
 - Never return a partial file, a single method, or a snippet. new_content must be the entire file contents.
 - Make the smallest safe change possible to fix the issue.
-- Do not use placeholder comments like "// ... rest unchanged" — include ALL code.
 - Do not invent APIs that don't exist.
 
 Your JSON must contain:
@@ -130,14 +127,6 @@ diagnosis
 summary
 new_content
 """
-
-    # Each retry gets a more forceful reminder
-    retry_additions = {
-        2: "\nCRITICAL: Your previous attempt returned an incomplete file. You MUST include every method, field, and using directive from the original file in new_content.",
-        3: "\nFINAL ATTEMPT: Return the ENTIRE file verbatim with only the single minimal change applied. Do not omit, summarize, or truncate any part of the file.",
-    }
-
-    system_prompt = base_system_prompt + retry_additions.get(attempt, "")
 
     user_prompt = f"""
 Task:

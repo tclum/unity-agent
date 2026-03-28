@@ -345,5 +345,113 @@
     "status": "done",
     "notes": "",
     "channel_id": 1485374241712111638
+  },
+  {
+    "id": 43,
+    "project_id": "ainaquest",
+    "title": "test auto pipeline \u2014 fix results ui bug",
+    "type": "general",
+    "status": "done",
+    "notes": "",
+    "channel_id": 1485374241712111638
+  },
+  {
+    "id": 44,
+    "project_id": "ainaquest",
+    "title": "test auto pipeline \u2014 fix results ui bug",
+    "type": "general",
+    "status": "done",
+    "notes": "",
+    "channel_id": 1485374241712111638
+  },
+  {
+    "id": 45,
+    "project_id": "ainaquest",
+    "title": "test auto pipeline \u2014 fix results ui bug",
+    "type": "general",
+    "status": "done",
+    "notes": "",
+    "channel_id": 1485374241712111638
+  },
+  {
+    "id": 46,
+    "project_id": "ainaquest",
+    "title": "test auto pipeline \u2014 fix results ui bug",
+    "type": "general",
+    "status": "done",
+    "notes": "",
+    "channel_id": 1485374241712111638
+  },
+  {
+    "id": 47,
+    "project_id": "ainaquest",
+    "title": "fix results ui bug \u2014 ensure ResultsPanel activation and correct indentation in ShowResults",
+    "type": "general",
+    "status": "done",
+    "notes": "",
+    "channel_id": 1485374241712111638
+  },
+  {
+    "id": 48,
+    "project_id": "ainaquest",
+    "title": "fix results ui bug \u2014 ensure ResultsPanel activation and correct indentation in ShowResults",
+    "type": "general",
+    "status": "done",
+    "notes": "",
+    "channel_id": 1485374241712111638
+  },
+  {
+    "id": 49,
+    "project_id": "ainaquest",
+    "title": "sync scoring across ScoringSystem and PlayerState",
+    "type": "general",
+    "status": "done",
+    "notes": "",
+    "channel_id": 1485374241712111638
+  },
+  {
+    "id": 50,
+    "project_id": "ainaquest",
+    "title": "sync scoring across ScoringSystem and PlayerState",
+    "type": "general",
+    "status": "done",
+    "notes": "",
+    "channel_id": 1485374241712111638
+  },
+  {
+    "id": 51,
+    "project_id": "ainaquest",
+    "title": "sync scoring across ScoringSystem and PlayerState",
+    "type": "general",
+    "status": "done",
+    "notes": "",
+    "channel_id": 1485374241712111638
+  },
+  {
+    "id": 52,
+    "project_id": "ainaquest",
+    "title": "change all card backgrounds to green in CardUIButton",
+    "type": "general",
+    "status": "done",
+    "notes": "",
+    "channel_id": 1485374241712111638
+  },
+  {
+    "id": 53,
+    "project_id": "ainaquest",
+    "title": "change all card backgrounds to green in CardUIButton",
+    "type": "general",
+    "status": "done",
+    "notes": "",
+    "channel_id": 1485374241712111638
+  },
+  {
+    "id": 54,
+    "project_id": "ainaquest",
+    "title": "change all card backgrounds to green in CardUIButton",
+    "type": "general",
+    "status": "done",
+    "notes": "",
+    "channel_id": 1485374241712111638
   }
 ]

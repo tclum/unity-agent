@@ -93,5 +93,107 @@
         "unity log contains strong error signal"
       ]
     }
+  },
+  {
+    "id": 8,
+    "task_id": 45,
+    "project_id": "ainaquest",
+    "file_path": "/Users/paceai1/Desktop/Unity/AinaQuest/Assets/Scripts/UI/ResultsUI.cs",
+    "new_content": "using System.Collections.Generic;\nusing System.Linq;\nusing TMPro;\nusing UnityEngine;\nusing UnityEngine.SceneManagement;\nusing UnityEngine.UI;\n\npublic class ResultsUI : MonoBehaviour\n{\n    public GameObject ResultsPanel;\n    public TextMeshProUGUI TitleText;\n    public TextMeshProUGUI ScoreSummaryText;\n    public Button PlayAgainButton;\n    public Button MainMenuButton;\n\n    [Header(\"Gameplay UI To Hide\")]\n    public GameObject HandPanel;\n    public GameObject ConfirmButtonObject;\n    public GameObject SelectedCardTextObject;\n    public GameObject LogTextObject;\n    public GameObject RevealPanel;\n    public GameObject FieldPanel;\n    public GameObject TurnTransitionPanel;\n\n    private void Awake()\n    {\n        Debug.Log($\"[ResultsUI] Awake on {gameObject.name}\");\n        Hide();\n    }\n\n    public void ShowResults(List<PlayerState> players)\n    {\n        Debug.Log($\"[ResultsUI] ShowResults on {gameObject.name}\");\n\n        HideGameplayUI();\n\n        // Reset UI state before populating new results\n        if (TitleText != null)\n            TitleText.text = string.Empty;\n        if (ScoreSummaryText != null)\n            ScoreSummaryText.text = string.Empty;\n\n        // Validate players before showing panel\n        if (players == null || players.Count == 0)\n        {\n            Debug.LogWarning(\"[ResultsUI] ShowResults called with no players.\");\n            return;\n        }\n\n        Debug.Log(\"[ResultsUI] ShowResults called with \" + players.Count + \" players.\");\n\n        List<PlayerState> orderedPlayers = players\n            .OrderByDescending(p => p.TotalScore)\n            .ToList();\n\n        PlayerState winner = orderedPlayers[0];\n\n        if (TitleText != null)\n            TitleText.text = winner.PlayerName + \" Wins!\";\n        else\n            Debug.LogWarning(\"[ResultsUI] TitleText is not assigned.\");\n\n        if (ScoreSummaryText != null)\n        {\n            var lines = orderedPlayers\n                .Select(p => $\"{p.PlayerName}: {p.TotalScore} (Invasives: {p.PersistentInvasives.Count})\");\n\n            ScoreSummaryText.text = string.Join(\"\\n\", lines);\n            Debug.Log(\"[ResultsUI] ScoreSummaryText updated to:\\n\" + ScoreSummaryText.text);\n        }\n        else\n        {\n            Debug.LogWarning(\"[ResultsUI] ScoreSummaryText is not assigned.\");\n        }\n\n        if (PlayAgainButton != null)\n        {\n            PlayAgainButton.onClick.RemoveAllListeners();\n            PlayAgainButton.onClick.AddListener(PlayAgain);\n        }\n\n        if (MainMenuButton != null)\n        {\n            MainMenuButton.onClick.RemoveAllListeners();\n            MainMenuButton.onClick.AddListener(ReturnToMainMenu);\n        }\n\n        // Fix: Make sure ResultsPanel is visible when showing results.\n        if (ResultsPanel != null)\n        {\n            ResultsPanel.SetActive(true);\n            Debug.Log($\"[ResultsUI] Activated ResultsPanel: {ResultsPanel.name}\");\n        }\n        else\n        {\n            Debug.LogWarning(\"[ResultsUI] ShowResults called but ResultsPanel is not assigned.\");\n        }\n    }\n\n    private void HideGameplayUI()\n    {\n        SetInactiveIfAssigned(HandPanel, \"HandPanel\");\n        SetInactiveIfAssigned(ConfirmButtonObject, \"ConfirmButtonObject\");\n        SetInactiveIfAssigned(SelectedCardTextObject, \"SelectedCardTextObject\");\n        SetInactiveIfAssigned(LogTextObject, \"LogTextObject\");\n        SetInactiveIfAssigned(RevealPanel, \"RevealPanel\");\n        SetInactiveIfAssigned(FieldPanel, \"FieldPanel\");\n        SetInactiveIfAssigned(TurnTransitionPanel, \"TurnTransitionPanel\");\n    }\n\n    private void SetInactiveIfAssigned(GameObject obj, string label)\n    {\n        if (obj != null)\n        {\n            obj.SetActive(false);\n            Debug.Log($\"[ResultsUI] Hid gameplay UI object: {label}\");\n        }\n    }\n\n    public void Hide()\n    {\n        Debug.Log($\"[ResultsUI] Hide called on {gameObject.name}\");\n\n        if (ResultsPanel != null)\n        {\n            Debug.Log($\"[ResultsUI] Deactivating ResultsPanel: {ResultsPanel.name}\");\n            ResultsPanel.SetActive(false);\n            Debug.Log($\"[ResultsUI] ResultsPanel activeSelf after SetActive(false): {ResultsPanel.activeSelf}\");\n        }\n        else\n        {\n            Debug.LogWarning(\"[ResultsUI] Hide called but ResultsPanel is not assigned.\");\n        }\n    }\n\n    private void PlayAgain()\n    {\n        Time.timeScale = 1f;\n        SceneManager.LoadScene(\"Gameplay\");\n    }\n\n    private void ReturnToMainMenu()\n    {\n        Time.timeScale = 1f;\n        SceneManager.LoadScene(\"MainMenu\");\n    }\n}",
+    "summary": "The bug was caused by ShowResults not enabling ResultsPanel, so the UI was invisible. The fix is to set ResultsPanel.SetActive(true) in ShowResults after updating UI elements.",
+    "status": "applied",
+    "validation": {
+      "is_valid": true,
+      "errors": [],
+      "warnings": [],
+      "evidence_reasons": [
+        "task title matches patchable issue pattern",
+        "unity log contains strong error signal"
+      ]
+    }
+  },
+  {
+    "id": 9,
+    "task_id": 46,
+    "project_id": "ainaquest",
+    "file_path": "/Users/paceai1/Desktop/Unity/AinaQuest/Assets/Scripts/UI/ResultsUI.cs",
+    "new_content": "using System.Collections.Generic;\nusing System.Linq;\nusing TMPro;\nusing UnityEngine;\nusing UnityEngine.SceneManagement;\nusing UnityEngine.UI;\n\npublic class ResultsUI : MonoBehaviour\n{\n    public GameObject ResultsPanel;\n    public TextMeshProUGUI TitleText;\n    public TextMeshProUGUI ScoreSummaryText;\n    public Button PlayAgainButton;\n    public Button MainMenuButton;\n\n    [Header(\"Gameplay UI To Hide\")]\n    public GameObject HandPanel;\n    public GameObject ConfirmButtonObject;\n    public GameObject SelectedCardTextObject;\n    public GameObject LogTextObject;\n    public GameObject RevealPanel;\n    public GameObject FieldPanel;\n    public GameObject TurnTransitionPanel;\n\n    private void Awake()\n    {\n        Debug.Log($\"[ResultsUI] Awake on {gameObject.name}\");\n        Hide();\n    }\n\n    public void ShowResults(List<PlayerState> players)\n    {\n        Debug.Log($\"[ResultsUI] ShowResults on {gameObject.name}\");\n\n        // Fix: Make sure ResultsPanel is visible before updating UI\n        if (ResultsPanel != null)\n        {\n            ResultsPanel.SetActive(true);\n            Debug.Log($\"[ResultsUI] Activated ResultsPanel: {ResultsPanel.name}\");\n        }\n        else\n        {\n            Debug.LogWarning(\"[ResultsUI] ShowResults called but ResultsPanel is not assigned.\");\n        }\n\n        HideGameplayUI();\n\n        // Reset UI state before populating new results\n        if (TitleText != null)\n            TitleText.text = string.Empty;\n        if (ScoreSummaryText != null)\n            ScoreSummaryText.text = string.Empty;\n\n        // Validate players before showing panel\n        if (players == null || players.Count == 0)\n        {\n            Debug.LogWarning(\"[ResultsUI] ShowResults called with no players.\");\n            return;\n        }\n\n        Debug.Log(\"[ResultsUI] ShowResults called with \" + players.Count + \" players.\");\n\n        List<PlayerState> orderedPlayers = players\n            .OrderByDescending(p => p.TotalScore)\n            .ToList();\n\n        PlayerState winner = orderedPlayers[0];\n\n        if (TitleText != null)\n            TitleText.text = winner.PlayerName + \" Wins!\";\n        else\n            Debug.LogWarning(\"[ResultsUI] TitleText is not assigned.\");\n\n        if (ScoreSummaryText != null)\n        {\n            var lines = orderedPlayers\n                .Select(p => $\"{p.PlayerName}: {p.TotalScore} (Invasives: {p.PersistentInvasives.Count})\");\n\n            ScoreSummaryText.text = string.Join(\"\\n\", lines);\n            Debug.Log(\"[ResultsUI] ScoreSummaryText updated to:\\n\" + ScoreSummaryText.text);\n        }\n        else\n        {\n            Debug.LogWarning(\"[ResultsUI] ScoreSummaryText is not assigned.\");\n        }\n\n        if (PlayAgainButton != null)\n        {\n            PlayAgainButton.onClick.RemoveAllListeners();\n            PlayAgainButton.onClick.AddListener(PlayAgain);\n        }\n\n        if (MainMenuButton != null)\n        {\n            MainMenuButton.onClick.RemoveAllListeners();\n            MainMenuButton.onClick.AddListener(ReturnToMainMenu);\n        }\n    }\n\n    private void HideGameplayUI()\n    {\n        SetInactiveIfAssigned(HandPanel, \"HandPanel\");\n        SetInactiveIfAssigned(ConfirmButtonObject, \"ConfirmButtonObject\");\n        SetInactiveIfAssigned(SelectedCardTextObject, \"SelectedCardTextObject\");\n        SetInactiveIfAssigned(LogTextObject, \"LogTextObject\");\n        SetInactiveIfAssigned(RevealPanel, \"RevealPanel\");\n        SetInactiveIfAssigned(FieldPanel, \"FieldPanel\");\n        SetInactiveIfAssigned(TurnTransitionPanel, \"TurnTransitionPanel\");\n    }\n\n    private void SetInactiveIfAssigned(GameObject obj, string label)\n    {\n        if (obj != null)\n        {\n            obj.SetActive(false);\n            Debug.Log($\"[ResultsUI] Hid gameplay UI object: {label}\");\n        }\n    }\n\n    public void Hide()\n    {\n        Debug.Log($\"[ResultsUI] Hide called on {gameObject.name}\");\n\n        if (ResultsPanel != null)\n        {\n            Debug.Log($\"[ResultsUI] Deactivating ResultsPanel: {ResultsPanel.name}\");\n            ResultsPanel.SetActive(false);\n            Debug.Log($\"[ResultsUI] ResultsPanel activeSelf after SetActive(false): {ResultsPanel.activeSelf}\");\n        }\n        else\n        {\n            Debug.LogWarning(\"[ResultsUI] Hide called but ResultsPanel is not assigned.\");\n        }\n    }\n\n    private void PlayAgain()\n    {\n        Time.timeScale = 1f;\n        SceneManager.LoadScene(\"Gameplay\");\n    }\n\n    private void ReturnToMainMenu()\n    {\n        Time.timeScale = 1f;\n        SceneManager.LoadScene(\"MainMenu\");\n    }\n}",
+    "summary": "Moved ResultsPanel.SetActive(true) to the beginning of ShowResults to guarantee the panel is activated before any UI updates, which solves the bug where the results UI does not reliably appear when results are shown.",
+    "status": "applied",
+    "validation": {
+      "is_valid": true,
+      "errors": [],
+      "warnings": [],
+      "evidence_reasons": [
+        "task title matches patchable issue pattern",
+        "unity log contains strong error signal"
+      ]
+    }
+  },
+  {
+    "id": 10,
+    "task_id": 49,
+    "project_id": "ainaquest",
+    "file_path": "/Users/paceai1/Desktop/Unity/AinaQuest/Assets/Scripts/Core/ScoringSystem.cs",
+    "new_content": "using System.Collections.Generic;\nusing UnityEngine;\n\npublic static class ScoringSystem\n{\n    public static int CalculateRoundScore(PlayerState player)\n    {\n        int score = 0;\n\n        foreach (var card in player.PlantedThisRound)\n        {\n            if (card.CardType != CardType.Invasive)\n            {\n                score += card.BasePoints;\n            }\n        }\n\n        player.TotalScore += score;\n        return score;\n    }\n\n    public static void ApplyFinalInvasivePenalty(List<PlayerState> players)\n    {\n        int maxInvasives = 0;\n\n        foreach (var player in players)\n        {\n            if (player.PersistentInvasives.Count > maxInvasives)\n            {\n                maxInvasives = player.PersistentInvasives.Count;\n            }\n        }\n\n        Debug.Log(\"Max invasives found: \" + maxInvasives);\n\n        if (maxInvasives <= 0) return;\n\n        foreach (var player in players)\n        {\n            Debug.Log(player.PlayerName + \" invasives: \" + player.PersistentInvasives.Count);\n\n            if (player.PersistentInvasives.Count == maxInvasives)\n            {\n                player.TotalScore -= 20;\n                Debug.Log(player.PlayerName + \" received invasive penalty. New score: \" + player.TotalScore);\n            }\n        }\n    }\n}",
+    "summary": "Updated ScoringSystem.CalculateRoundScore to also update player.TotalScore by incrementing it with the calculated round score. This ensures consistent and synchronized scoring across ScoringSystem and PlayerState.",
+    "status": "applied",
+    "validation": {
+      "is_valid": true,
+      "errors": [],
+      "warnings": [],
+      "evidence_reasons": [
+        "unity log contains strong error signal"
+      ]
+    }
+  },
+  {
+    "id": 11,
+    "task_id": 50,
+    "project_id": "ainaquest",
+    "file_path": "/Users/paceai1/Desktop/Unity/AinaQuest/Assets/Scripts/Core/ScoringSystem.cs",
+    "new_content": "using System.Collections.Generic;\nusing UnityEngine;\n\npublic static class ScoringSystem\n{\n    public static int CalculateRoundScore(PlayerState player)\n    {\n        int score = 0;\n\n        foreach (var card in player.PlantedThisRound)\n        {\n            if (card.CardType != CardType.Invasive)\n            {\n                score += card.BasePoints;\n            }\n        }\n\n        player.TotalScore = score;\n        return score;\n    }\n\n    public static void ApplyFinalInvasivePenalty(List<PlayerState> players)\n    {\n        int maxInvasives = 0;\n\n        foreach (var player in players)\n        {\n            if (player.PersistentInvasives.Count > maxInvasives)\n            {\n                maxInvasives = player.PersistentInvasives.Count;\n            }\n        }\n\n        Debug.Log(\"Max invasives found: \" + maxInvasives);\n\n        if (maxInvasives <= 0) return;\n\n        foreach (var player in players)\n        {\n            Debug.Log(player.PlayerName + \" invasives: \" + player.PersistentInvasives.Count);\n\n            if (player.PersistentInvasives.Count == maxInvasives)\n            {\n                player.TotalScore -= 20;\n                Debug.Log(player.PlayerName + \" received invasive penalty. New score: \" + player.TotalScore);\n            }\n        }\n    }\n}",
+    "summary": "Updated ScoringSystem.CalculateRoundScore to set player.TotalScore to the calculated value, ensuring that scoring is always consistent between ScoringSystem and PlayerState.",
+    "status": "applied",
+    "validation": {
+      "is_valid": true,
+      "errors": [],
+      "warnings": [],
+      "evidence_reasons": [
+        "unity log contains strong error signal"
+      ]
+    }
+  },
+  {
+    "id": 12,
+    "task_id": 51,
+    "project_id": "ainaquest",
+    "file_path": "/Users/paceai1/Desktop/Unity/AinaQuest/Assets/Scripts/Core/PlayerState.cs",
+    "new_content": "using System.Collections.Generic;\n\n[System.Serializable]\npublic class PlayerState\n{\n    public int PlayerId;\n    public string PlayerName;\n    public bool IsHuman;\n\n    public int TotalScore;\n\n    public int PendingExtraPlants = 0;\n    public bool HasPakukui = false;\n\n    public List<CardData> Hand = new List<CardData>();\n    public List<CardData> PlantedThisRound = new List<CardData>();\n    public List<CardData> PersistentInvasives = new List<CardData>();\n\n    public PlayerState(int id, string name, bool isHuman)\n    {\n        PlayerId = id;\n        PlayerName = name;\n        IsHuman = isHuman;\n        TotalScore = 0;\n    }\n\n    public void ResetRoundData()\n    {\n        Hand.Clear();\n        PlantedThisRound.Clear();\n    }\n\n    // Syncs the score calculation with ScoringSystem\n    public void SyncScoreFromPlantedThisRound()\n    {\n        int score = 0;\n        foreach (var card in PlantedThisRound)\n        {\n            if (card.CardType != CardType.Invasive)\n            {\n                score += card.BasePoints;\n            }\n        }\n        TotalScore = score;\n    }\n}\n",
+    "summary": "Added SyncScoreFromPlantedThisRound() to PlayerState for consistent score calculation and to ensure safe direct syncing of scoring logic across both ScoringSystem and PlayerState.",
+    "status": "applied",
+    "validation": {
+      "is_valid": true,
+      "errors": [],
+      "warnings": [],
+      "evidence_reasons": []
+    }
+  },
+  {
+    "id": 13,
+    "task_id": 54,
+    "project_id": "ainaquest",
+    "file_path": "/Users/paceai1/Desktop/Unity/AinaQuest/Assets/Scripts/UI/CardUIButton.cs",
+    "new_content": "using TMPro;\nusing UnityEngine;\nusing UnityEngine.UI;\n\npublic class CardUIButton : MonoBehaviour\n{\n    public TextMeshProUGUI Label;\n    public Button Button;\n    public Image Background;\n\n    private CardData cardData;\n    private HumanTurnUI humanTurnUI;\n\n    public CardData GetCardData()\n    {\n        return cardData;\n    }\n\n    public void Setup(CardData card, HumanTurnUI ui)\n    {\n        cardData = card;\n        humanTurnUI = ui;\n\n        if (Label != null)\n        {\n            Label.text = card.CardName + \"\\n\" + card.BasePoints + \" pts\";\n        }\n\n        SetSelected(false);\n\n        if (Button != null)\n        {\n            Button.onClick.RemoveAllListeners();\n            Button.onClick.AddListener(OnClicked);\n        }\n    }\n\n    public void SetSelected(bool selected)\n    {\n        if (Background != null)\n        {\n            Background.color = Color.green;\n        }\n    }\n\n    private void OnClicked()\n    {\n        if (humanTurnUI != null && cardData != null)\n        {\n            humanTurnUI.SelectCard(cardData);\n        }\n    }\n}",
+    "summary": "Replaced all instances of Color.white and Color.yellow in SetSelected method with Color.green so that the card background is always green, for both selected and unselected states.",
+    "status": "applied",
+    "validation": {
+      "is_valid": true,
+      "errors": [],
+      "warnings": [],
+      "evidence_reasons": [
+        "unity log contains strong error signal"
+      ]
+    }
   }
 ]

@@ -1,18 +1,28 @@
 def classify_task(task_title: str) -> str:
-
     lower = task_title.lower()
 
-    if any(word in lower for word in [
+    # Art signals — use whole-word or unambiguous phrases only
+    art_signals = [
         "card art",
+        "card artwork",
+        "card image",
+        "card sprite",
+        "card texture",
+        "card illustration",
+        "card frame",
+        "card icon",
+        "card back ",       # trailing space prevents matching "card background"
+        "card back.",
+        "card back,",
         "png",
-        "design",
-        "card back",
-        "frame",
-        "icon"
-    ]):
-        return "art"
+        "sprite",
+        "artwork",
+        "illustration",
+        "design asset",
+    ]
 
-    if any(word in lower for word in [
+    # Code signals
+    code_signals = [
         "card",
         "plant",
         "score",
@@ -21,8 +31,21 @@ def classify_task(task_title: str) -> str:
         "ui",
         "bug",
         "fix",
-        "null"
-    ]):
+        "null",
+        "background",
+        "color",
+        "colour",
+        "green",
+        "button",
+        "panel",
+        "text",
+        "animation",
+    ]
+
+    if any(signal in lower for signal in art_signals):
+        return "art"
+
+    if any(signal in lower for signal in code_signals):
         return "code"
 
     return "general"
