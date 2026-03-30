@@ -11,7 +11,7 @@ def classify_task(task_title: str) -> str:
         "card illustration",
         "card frame",
         "card icon",
-        "card back ",       # trailing space prevents matching "card background"
+        "card back ",
         "card back.",
         "card back,",
         "png",
@@ -19,6 +19,24 @@ def classify_task(task_title: str) -> str:
         "artwork",
         "illustration",
         "design asset",
+    ]
+
+    # Prefab/asset signals
+    prefab_signals = [
+        "assign",
+        "wire up",
+        "wire the",
+        "inspector",
+        "prefab",
+        "scriptable",
+        "card data",
+        "base points",
+        "card type",
+        "effect type",
+        "assign artwork",
+        "assign sprite",
+        "set points",
+        "set description",
     ]
 
     # Code signals
@@ -44,6 +62,9 @@ def classify_task(task_title: str) -> str:
 
     if any(signal in lower for signal in art_signals):
         return "art"
+
+    if any(signal in lower for signal in prefab_signals):
+        return "prefab"
 
     if any(signal in lower for signal in code_signals):
         return "code"

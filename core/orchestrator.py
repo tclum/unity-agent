@@ -6,6 +6,7 @@ from core.config_loader import load_project_config
 from agents.planner_agent import make_plan
 from agents.code_agent import handle_task as handle_code_task
 from agents.art_agent import handle_task as handle_art_task
+from agents.prefab_agent import handle_task as handle_prefab_task
 from agents.qa_agent import review_task_result
 from integrations.git_manager import git_checkpoint
 from integrations.discord_notifier import send_message
@@ -36,6 +37,8 @@ def process_task(task: dict):
 
     if task_type == "art":
         result = handle_art_task(task, project_config)
+    elif task_type == "prefab":
+        result = handle_prefab_task(task, project_config)
     else:
         result = handle_code_task(task, project_config)
 
@@ -45,17 +48,17 @@ def process_task(task: dict):
     print(result["summary"])
     if task.get("channel_id"):
         send_message(
-        task["channel_id"],
-        f"Task #{task['id']} result:\n\n{result['summary']}"
-    )
-        
+            task["channel_id"],
+            f"Task #{task['id']} result:\n\n{result['summary']}"
+        )
+
     print("[QA]")
     print(qa_result["notes"])
     if task.get("channel_id"):
         send_message(
-        task["channel_id"],
-        f"Task #{task['id']} completed.\nQA: {qa_result['notes']}"
-    )
+            task["channel_id"],
+            f"Task #{task['id']} completed.\nQA: {qa_result['notes']}"
+        )
 
     update_task_status(task["id"], "done")
     print(f"[Orchestrator] Completed task #{task['id']}")
