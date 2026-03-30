@@ -26,7 +26,8 @@ def process_task(task: dict):
     router = load_project_router(task["project_id"])
 
     inferred_type = router.classify_task(task["title"])
-    task_type = task["type"] if task["type"] != "general" else inferred_type
+    # Use explicit type if set by Discord command, fall back to classifier
+    task_type = task["type"] if task["type"] not in ("general", None) else inferred_type
 
     plan = make_plan(task, project_config)
     print("[Planner]")

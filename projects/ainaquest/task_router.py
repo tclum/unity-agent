@@ -22,18 +22,16 @@ def classify_task(task_title: str) -> str:
 
     # Art signals — generative/creative art tasks only
     art_signals = [
-        "card art",
-        "card artwork",
-        "card image",
-        "card sprite",
-        "card texture",
+        "generate card art",
+        "create card art",
+        "generate artwork",
+        "create artwork",
         "card illustration",
         "card frame",
         "card icon",
         "card back ",
         "card back.",
         "card back,",
-        "sprite",
         "illustration",
         "design asset",
         "generate art",

@@ -516,5 +516,86 @@
     "status": "done",
     "notes": "",
     "channel_id": 1485374241712111638
+  },
+  {
+    "id": 62,
+    "project_id": "ainaquest",
+    "title": "add ArtworkImage field to CardUIButton and display card artwork in Setup method",
+    "type": "general",
+    "status": "done",
+    "notes": "",
+    "channel_id": 1485374241712111638
+  },
+  {
+    "id": 63,
+    "project_id": "ainaquest",
+    "title": "add Image field for card sprite display to CardUIButton and set sprite in Setup",
+    "type": "general",
+    "status": "done",
+    "notes": "",
+    "channel_id": 1485374241712111638
+  },
+  {
+    "id": 64,
+    "project_id": "ainaquest",
+    "title": "add CardSprite field to CardUIButton to show card artwork in Setup method",
+    "type": "general",
+    "status": "done",
+    "notes": "",
+    "channel_id": 1485374241712111638
+  },
+  {
+    "id": 65,
+    "project_id": "ainaquest",
+    "title": "add CardArtImage field to CardUIButton and display card artwork sprite in Setup",
+    "type": "code",
+    "status": "done",
+    "notes": "",
+    "channel_id": 1485374241712111638
+  },
+  {
+    "id": 66,
+    "project_id": "ainaquest",
+    "title": "fix CardUIButton Setup method \u2014 change card.CardArtSprite to card.Artwork",
+    "type": "code",
+    "status": "done",
+    "notes": "",
+    "channel_id": 1485374241712111638
+  },
+  {
+    "id": 67,
+    "project_id": "ainaquest",
+    "title": "add CardArtImage Image child object to CardButtonPrefab and wire it to CardUIButton",
+    "type": "prefab",
+    "status": "done",
+    "notes": "",
+    "channel_id": 1485374241712111638
+  },
+  {
+    "id": 68,
+    "project_id": "ainaquest",
+    "title": "fix SetSelected in CardUIButton \u2014 unselected cards should have white background, selected cards should highlight yellow. Do not change CardArtImage logic",
+    "type": "code",
+    "status": "done",
+    "notes": "",
+    "channel_id": 1485374241712111638
+  },
+  {
+    "id": 69,
+    "project_id": "ainaquest",
+    "title": "fix FieldUI SpawnCardInField to call cardUI.Setup instead of manually setting Label.text \u2014 pass null for HumanTurnUI since field cards are not interactive",
+    "type": "code",
+    "status": "done",
+    "notes": "",
+    "channel_id": 1485374241712111638
+  },
+  {
+    "id": 70,
+    "project_id": "ainaquest",
+    "title": "fix RevealUI to use cardUI.Setup for displaying cards \u2014 face down cards should show no artwork with label \"???\", revealed cards should call Setup with the actual card data",
+    "type": "code",
+    "status": "done",
+    "notes": "",
+    "channel_id": 1485374241712111638
   }
 ]

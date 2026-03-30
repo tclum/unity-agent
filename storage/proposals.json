@@ -195,5 +195,92 @@
         "unity log contains strong error signal"
       ]
     }
+  },
+  {
+    "id": 14,
+    "task_id": 65,
+    "project_id": "ainaquest",
+    "file_path": "/Users/paceai1/Desktop/Unity/AinaQuest/Assets/Scripts/UI/CardUIButton.cs",
+    "new_content": "using TMPro;\nusing UnityEngine;\nusing UnityEngine.UI;\n\npublic class CardUIButton : MonoBehaviour\n{\n    public TextMeshProUGUI Label;\n    public Button Button;\n    public Image Background;\n    public Image CardArtImage;\n\n    private CardData cardData;\n    private HumanTurnUI humanTurnUI;\n\n    public CardData GetCardData()\n    {\n        return cardData;\n    }\n\n    public void Setup(CardData card, HumanTurnUI ui)\n    {\n        cardData = card;\n        humanTurnUI = ui;\n\n        if (Label != null)\n        {\n            Label.text = card.CardName + \"\\n\" + card.BasePoints + \" pts\";\n        }\n\n        SetSelected(false);\n\n        if (Button != null)\n        {\n            Button.onClick.RemoveAllListeners();\n            Button.onClick.AddListener(OnClicked);\n        }\n\n        if (CardArtImage != null)\n        {\n            CardArtImage.sprite = card.CardArtSprite;\n            CardArtImage.enabled = card.CardArtSprite != null;\n        }\n    }\n\n    public void SetSelected(bool selected)\n    {\n        if (Background != null)\n        {\n            Background.color = Color.green;\n        }\n    }\n\n    private void OnClicked()\n    {\n        if (humanTurnUI != null && cardData != null)\n        {\n            humanTurnUI.SelectCard(cardData);\n        }\n    }\n}",
+    "summary": "Added a public Image field named CardArtImage to CardUIButton. Modified the Setup method so CardArtImage displays the card's artwork sprite if available. No other logic or structure changed.",
+    "status": "applied",
+    "validation": {
+      "is_valid": true,
+      "errors": [],
+      "warnings": [],
+      "evidence_reasons": [
+        "unity log contains strong error signal"
+      ]
+    }
+  },
+  {
+    "id": 15,
+    "task_id": 66,
+    "project_id": "ainaquest",
+    "file_path": "/Users/paceai1/Desktop/Unity/AinaQuest/Assets/Scripts/UI/CardUIButton.cs",
+    "new_content": "using TMPro;\nusing UnityEngine;\nusing UnityEngine.UI;\n\npublic class CardUIButton : MonoBehaviour\n{\n    public TextMeshProUGUI Label;\n    public Button Button;\n    public Image Background;\n    public Image CardArtImage;\n\n    private CardData cardData;\n    private HumanTurnUI humanTurnUI;\n\n    public CardData GetCardData()\n    {\n        return cardData;\n    }\n\n    public void Setup(CardData card, HumanTurnUI ui)\n    {\n        cardData = card;\n        humanTurnUI = ui;\n\n        if (Label != null)\n        {\n            Label.text = card.CardName + \"\\n\" + card.BasePoints + \" pts\";\n        }\n\n        SetSelected(false);\n\n        if (Button != null)\n        {\n            Button.onClick.RemoveAllListeners();\n            Button.onClick.AddListener(OnClicked);\n        }\n\n        if (CardArtImage != null)\n        {\n            CardArtImage.sprite = card.Artwork;\n            CardArtImage.enabled = card.Artwork != null;\n        }\n    }\n\n    public void SetSelected(bool selected)\n    {\n        if (Background != null)\n        {\n            Background.color = Color.green;\n        }\n    }\n\n    private void OnClicked()\n    {\n        if (humanTurnUI != null && cardData != null)\n        {\n            humanTurnUI.SelectCard(cardData);\n        }\n    }\n}",
+    "summary": "Changed references to card.CardArtSprite to card.Artwork in the Setup method, ensuring the correct card artwork sprite is displayed.",
+    "status": "applied",
+    "validation": {
+      "is_valid": true,
+      "errors": [],
+      "warnings": [],
+      "evidence_reasons": [
+        "unity log contains strong error signal"
+      ]
+    }
+  },
+  {
+    "id": 16,
+    "task_id": 68,
+    "project_id": "ainaquest",
+    "file_path": "/Users/paceai1/Desktop/Unity/AinaQuest/Assets/Scripts/Core/GameSettings.cs",
+    "new_content": "public static class GameSettings\n{\n    public static int SelectedPlayerCount = 2;\n    public static bool SoloMode = false;\n}",
+    "summary": "No change was made to GameSettings.cs because it does not contain the SetSelected method or card UI logic. If you require the fix for SetSelected, please provide the C# file containing the CardUIButton class.",
+    "status": "applied",
+    "validation": {
+      "is_valid": true,
+      "errors": [],
+      "warnings": [
+        "Proposed patch is identical to the original file."
+      ],
+      "evidence_reasons": [
+        "unity log contains strong error signal"
+      ]
+    }
+  },
+  {
+    "id": 17,
+    "task_id": 69,
+    "project_id": "ainaquest",
+    "file_path": "/Users/paceai1/Desktop/Unity/AinaQuest/Assets/Scripts/UI/FieldUI.cs",
+    "new_content": "using System.Collections.Generic;\nusing UnityEngine;\nusing UnityEngine.UI;\n\npublic class FieldUI : MonoBehaviour\n{\n    public List<PlayerAreaUI> PlayerAreas = new List<PlayerAreaUI>();\n    public GameObject CardButtonPrefab;\n\n    private readonly Dictionary<int, List<GameObject>> spawnedFieldCards = new Dictionary<int, List<GameObject>>();\n\n    public void Initialize(List<PlayerState> players)\n    {\n        for (int i = 0; i < PlayerAreas.Count; i++)\n        {\n            bool active = i < players.Count;\n            PlayerAreas[i].gameObject.SetActive(active);\n\n            if (active)\n            {\n                PlayerAreas[i].SetPlayerName(players[i].PlayerName);\n                PlayerAreas[i].SetScore(players[i].TotalScore);\n                PlayerAreas[i].SetInvasives(players[i].PersistentInvasives.Count);\n            }\n        }\n    }\n\n    public void ResetFieldUI(List<PlayerState> players)\n    {\n        foreach (var pair in spawnedFieldCards)\n        {\n            foreach (var obj in pair.Value)\n            {\n                if (obj != null)\n                    Destroy(obj);\n            }\n        }\n\n        spawnedFieldCards.Clear();\n        UpdateRunningDisplays(players);\n    }\n\n    public void AddPlantedCards(List<PlayerState> players, Dictionary<int, List<CardData>> selections)\n    {\n        for (int i = 0; i < players.Count && i < PlayerAreas.Count; i++)\n        {\n            PlayerState player = players[i];\n\n            if (!selections.ContainsKey(player.PlayerId)) continue;\n            if (selections[player.PlayerId] == null || selections[player.PlayerId].Count == 0) continue;\n\n            if (!spawnedFieldCards.ContainsKey(player.PlayerId))\n                spawnedFieldCards[player.PlayerId] = new List<GameObject>();\n\n            foreach (var card in selections[player.PlayerId])\n            {\n                SpawnCardInField(card, PlayerAreas[i].FieldPanel, spawnedFieldCards[player.PlayerId]);\n            }\n        }\n\n        UpdateRunningDisplays(players);\n    }\n\n    private void SpawnCardInField(CardData card, Transform parent, List<GameObject> trackingList)\n    {\n        if (parent == null)\n        {\n            Debug.LogError(\"SpawnCardInField failed: parent is null for card \" + card.CardName);\n            return;\n        }\n\n        Debug.Log(\"Spawning field card \" + card.CardName + \" into \" + parent.name);\n\n        GameObject cardGO = Instantiate(CardButtonPrefab, parent);\n        cardGO.SetActive(true);\n\n        RectTransform rt = cardGO.GetComponent<RectTransform>();\n        if (rt != null)\n        {\n            rt.localScale = Vector3.one;\n            rt.localRotation = Quaternion.identity;\n            rt.anchoredPosition = Vector2.zero;\n        }\n\n        CardUIButton cardUI = cardGO.GetComponent<CardUIButton>();\n        if (cardUI != null)\n        {\n            cardUI.Setup(card, null); // Pass null for HumanTurnUI to indicate non-interactive field card\n        }\n        else\n        {\n            Debug.LogWarning(\"CardUIButton missing on spawned field card prefab.\");\n        }\n\n        Button button = cardGO.GetComponent<Button>();\n        if (button != null)\n        {\n            button.interactable = false;\n        }\n\n        trackingList.Add(cardGO);\n    }\n\n    private void UpdateRunningDisplays(List<PlayerState> players)\n    {\n        for (int i = 0; i < players.Count && i < PlayerAreas.Count; i++)\n        {\n            int visibleScore = players[i].TotalScore + ScoringSystem.CalculateRoundScore(players[i]);\n\n            Debug.Log(\"Updating score for \" + players[i].PlayerName + \" to \" + visibleScore);\n            Debug.Log(\"Updating invasives for \" + players[i].PlayerName + \" to \" + players[i].PersistentInvasives.Count);\n\n            if (PlayerAreas[i] != null)\n            {\n                PlayerAreas[i].SetScore(visibleScore);\n                PlayerAreas[i].SetInvasives(players[i].PersistentInvasives.Count);\n            }\n            else\n            {\n                Debug.LogError(\"PlayerAreas[\" + i + \"] is null.\");\n            }\n        }\n    }\n}\n",
+    "summary": "Replaced manual setting of cardUI.Label.text in SpawnCardInField with a call to cardUI.Setup(card, null), passing null for HumanTurnUI to correctly indicate a non-interactive, display-only field card.",
+    "status": "applied",
+    "validation": {
+      "is_valid": true,
+      "errors": [],
+      "warnings": [],
+      "evidence_reasons": []
+    }
+  },
+  {
+    "id": 18,
+    "task_id": 70,
+    "project_id": "ainaquest",
+    "file_path": "/Users/paceai1/Desktop/Unity/AinaQuest/Assets/Scripts/Data/CardData.cs",
+    "new_content": "using UnityEngine;\n\npublic enum CardType\n{\n    Native,\n    Canoe,\n    Invasive,\n    Resource\n}\n\npublic enum CardColorCategory\n{\n    None,\n    Red,\n    Blue,\n    Green,\n    Yellow\n}\n\npublic enum CardEffectType\n{\n    None,\n    Wai,\n    Pakukui\n}\n\n[CreateAssetMenu(fileName = \"NewCard\", menuName = \"AinaQuest/Card Data\")]\npublic class CardData : ScriptableObject\n{\n    public string CardName;\n    public CardType CardType;\n    public CardColorCategory ColorCategory;\n    public int BasePoints;\n    public CardEffectType EffectType;\n    public Sprite Artwork;\n    [TextArea] public string Description;\n}",
+    "summary": "No changes needed in CardData.cs. The requested fix pertains to the RevealUI logic which should be addressed in that UI/component script. CardData.cs correctly serves as a data container, and no patch is required here.",
+    "status": "applied",
+    "validation": {
+      "is_valid": true,
+      "errors": [],
+      "warnings": [
+        "Proposed patch is identical to the original file."
+      ],
+      "evidence_reasons": [
+        "unity log contains strong error signal"
+      ]
+    }
   }
 ]
