@@ -90,7 +90,7 @@ def generate_prefab_plan(
 
     script_guid_block = json.dumps(script_guids, indent=2)
     asset_guid_block = json.dumps(
-        {k: v for k, v in asset_guids.items() if len(k) > 8},  # skip short stem names
+        {k: v for k, v in asset_guids.items() if "." in k or k[0].isupper()},
         indent=2
     )
 
@@ -118,7 +118,7 @@ Rules:
   - String: Hello
 - script_guid must come from the provided script GUID map.
 - Asset GUIDs must come from the provided asset GUID map.
-- Only patch fields that are necessary to accomplish the task.
+- file_path must be the FULL ABSOLUTE path to the file (e.g. /Users/.../Assets/ScriptableObjects/...). Use the exact path shown in the asset contents headers above.
 - If no changes are needed, return an empty patches array.
 """
 
@@ -212,10 +212,116 @@ def apply_patches(patches: list[dict]) -> tuple[list[str], list[str]]:
     return changed, errors
 
 
+def assign_artwork_to_all_cards(
+    project_config: dict,
+    task: dict,
+) -> dict:
+    """
+    Special handler for bulk artwork assignment.
+    Matches each card asset to its PNG by name and patches directly
+    without going through the LLM — faster and more reliable for bulk ops.
+    """
+    asset_guids = build_asset_guid_map(project_config)
+    card_assets = [
+        p for p in find_relevant_assets(project_config, [], ".asset")
+        if "ScriptableObjects" in p
+    ]
+
+    changed_files = []
+    summaries = []
+    errors = []
+
+    for asset_path in card_assets:
+        stem = Path(asset_path).stem
+
+        # Check if a matching PNG exists
+        png_guid = asset_guids.get(stem)
+        if not png_guid:
+            # Try case-insensitive match
+            for key, guid in asset_guids.items():
+                if key.lower() == stem.lower() and not key.endswith(".asset"):
+                    png_guid = guid
+                    break
+
+        if not png_guid:
+            print(f"[PrefabAgent] No PNG found for {stem} — skipping")
+            continue
+
+        # Check if Artwork is already assigned
+        try:
+            yaml_text = Path(asset_path).read_text(encoding="utf-8")
+            current = None
+            for line in yaml_text.splitlines():
+                if line.strip().startswith("Artwork:"):
+                    current = line.strip()
+                    break
+
+            if current and png_guid in current:
+                print(f"[PrefabAgent] {stem} artwork already assigned — skipping")
+                continue
+        except Exception:
+            pass
+
+        field_value = f"{{fileID: 21300000, guid: {png_guid}, type: 3}}"
+        success, msg = patch_asset_field(
+            asset_path=asset_path,
+            field_name="Artwork",
+            field_value=field_value,
+        )
+
+        if success:
+            print(f"[PrefabAgent] ✓ Assigned artwork to {stem}")
+            changed_files.append(asset_path)
+            summaries.append(f"Assigned {stem}.png → {stem} card")
+        else:
+            print(f"[PrefabAgent] ✗ {msg}")
+            errors.append(msg)
+
+    if not changed_files:
+        return {
+            "changed_files": [],
+            "summary": (
+                "No artwork assignments made — all cards may already have artwork, "
+                "or no matching PNG files were found.\n\n"
+                + ("\n".join(f"- {e}" for e in errors) if errors else "")
+            ),
+        }
+
+    git_commit_files(
+        project_config,
+        changed_files,
+        f"agent bulk artwork assignment task #{task['id']}"
+    )
+
+    notify_discord(
+        f"✅ Artwork assigned to {len(changed_files)} card(s) (task #{task['id']})\n"
+        + "\n".join(f"- {s}" for s in summaries)
+    )
+
+    return {
+        "changed_files": changed_files,
+        "summary": (
+            f"Bulk artwork assignment complete.\n"
+            f"Task ID: {task['id']}\n"
+            f"Cards updated: {len(changed_files)}\n\n"
+            + "\n".join(f"- {s}" for s in summaries)
+            + ("\n\nErrors:\n" + "\n".join(f"- {e}" for e in errors) if errors else "")
+        ),
+    }
+
+
 def handle_task(task: dict, project_config: dict) -> dict:
     """Main entry point for prefab/asset tasks."""
     title = task["title"]
     lower = title.lower()
+
+    # Route bulk artwork assignment to dedicated fast handler
+    if any(phrase in lower for phrase in [
+        "assign artwork to all", "assign all artwork",
+        "artwork to all cards", "assign artwork to cards",
+    ]):
+        print(f"[PrefabAgent] Bulk artwork assignment for task #{task['id']}")
+        return assign_artwork_to_all_cards(project_config, task)
 
     # Build GUID maps
     print(f"[PrefabAgent] Building GUID maps...")
@@ -225,9 +331,14 @@ def handle_task(task: dict, project_config: dict) -> dict:
     # Find relevant prefabs and assets
     keywords = [w for w in lower.split() if len(w) > 3]
     relevant_prefabs = find_relevant_prefabs(project_config, keywords)
-    relevant_assets = find_relevant_assets(project_config, keywords)
 
-    # If no keyword match, include all prefabs
+    # For card asset tasks, always load all card assets
+    if any(w in lower for w in ["card", "cards", "artwork", "all", "assign"]):
+        relevant_assets = find_relevant_assets(project_config, [], ".asset")
+    else:
+        relevant_assets = find_relevant_assets(project_config, keywords)
+
+    # If no keyword match on prefabs, include all prefabs
     if not relevant_prefabs:
         from core.unity_meta_reader import find_prefabs
         relevant_prefabs = find_prefabs(project_config)

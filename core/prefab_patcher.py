@@ -21,10 +21,16 @@ def make_object_ref(file_id: str, guid: str = "", asset_type: int = 0) -> str:
     Build a Unity object reference string.
     For scene-local references: {fileID: 12345}
     For asset references: {fileID: 11400000, guid: abc123, type: 2}
+    For sprite references: {fileID: 21300000, guid: abc123, type: 3}
     """
     if guid:
         return f"{{fileID: {file_id}, guid: {guid}, type: {asset_type}}}"
     return f"{{fileID: {file_id}}}"
+
+
+SPRITE_FILE_ID = "21300000"   # Unity fileID for Sprite sub-asset
+TEXTURE_FILE_ID = "2800000"   # Unity fileID for Texture2D
+ASSET_FILE_ID = "11400000"    # Unity fileID for ScriptableObject assets
 
 
 def make_color(r: float, g: float, b: float, a: float = 1.0) -> str:

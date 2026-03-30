@@ -1,27 +1,8 @@
 def classify_task(task_title: str) -> str:
     lower = task_title.lower()
 
-    # Art signals — use whole-word or unambiguous phrases only
-    art_signals = [
-        "card art",
-        "card artwork",
-        "card image",
-        "card sprite",
-        "card texture",
-        "card illustration",
-        "card frame",
-        "card icon",
-        "card back ",
-        "card back.",
-        "card back,",
-        "png",
-        "sprite",
-        "artwork",
-        "illustration",
-        "design asset",
-    ]
-
-    # Prefab/asset signals
+    # Prefab/asset signals — check FIRST before art signals
+    # "assign artwork" is a prefab operation, not an art creation task
     prefab_signals = [
         "assign",
         "wire up",
@@ -37,6 +18,27 @@ def classify_task(task_title: str) -> str:
         "assign sprite",
         "set points",
         "set description",
+    ]
+
+    # Art signals — generative/creative art tasks only
+    art_signals = [
+        "card art",
+        "card artwork",
+        "card image",
+        "card sprite",
+        "card texture",
+        "card illustration",
+        "card frame",
+        "card icon",
+        "card back ",
+        "card back.",
+        "card back,",
+        "sprite",
+        "illustration",
+        "design asset",
+        "generate art",
+        "create art",
+        "draw",
     ]
 
     # Code signals
@@ -60,11 +62,12 @@ def classify_task(task_title: str) -> str:
         "animation",
     ]
 
-    if any(signal in lower for signal in art_signals):
-        return "art"
-
+    # Prefab checked first — "assign artwork" beats "artwork" alone
     if any(signal in lower for signal in prefab_signals):
         return "prefab"
+
+    if any(signal in lower for signal in art_signals):
+        return "art"
 
     if any(signal in lower for signal in code_signals):
         return "code"

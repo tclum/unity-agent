@@ -57,48 +57,39 @@ def build_script_guid_map(project_config: dict) -> dict[str, str]:
 
 def build_asset_guid_map(project_config: dict) -> dict[str, str]:
     """
-    Returns a map of asset path (relative to Assets/) → GUID.
-    e.g. {"ScriptableObjects/AinaQuest/Card Data/Kalo.asset": "4cce1b47..."}
-    Also includes a shortname map for convenience:
-    e.g. {"Kalo": "4cce1b47..."}
+    Returns a map of asset path → GUID.
+    Includes both absolute paths and stem names for easy lookup.
+    e.g. {
+        "/full/path/to/Kalo.asset": "4cce1b47...",
+        "Kalo": "4cce1b47...",
+    }
     """
     unity_root = Path(project_config["unity_project_path"])
     assets_dir = unity_root / "Assets"
     result = {}
 
-    for meta_path in assets_dir.rglob("*.asset.meta"):
-        if is_excluded(meta_path):
-            continue
-        guid = read_guid(meta_path)
-        if guid:
-            asset_path = meta_path.with_suffix("")  # remove .meta
-            rel_path = str(asset_path.relative_to(assets_dir))
-            result[rel_path] = guid
-            # Also index by stem name for easy lookup
-            result[asset_path.stem] = guid
-
-    # Also include prefabs
-    for meta_path in assets_dir.rglob("*.prefab.meta"):
-        if is_excluded(meta_path):
-            continue
-        guid = read_guid(meta_path)
-        if guid:
-            asset_path = meta_path.with_suffix("")
-            rel_path = str(asset_path.relative_to(assets_dir))
-            result[rel_path] = guid
-            result[asset_path.stem] = guid
-
-    # Also include PNG/image assets
-    for ext in ["*.png.meta", "*.jpg.meta", "*.jpeg.meta", "*.psd.meta"]:
-        for meta_path in assets_dir.rglob(ext):
+    for ext_pattern, asset_ext in [
+        ("*.asset.meta", ".asset"),
+        ("*.prefab.meta", ".prefab"),
+        ("*.png.meta", ".png"),
+        ("*.jpg.meta", ".jpg"),
+        ("*.jpeg.meta", ".jpeg"),
+        ("*.psd.meta", ".psd"),
+    ]:
+        for meta_path in assets_dir.rglob(ext_pattern):
             if is_excluded(meta_path):
                 continue
             guid = read_guid(meta_path)
             if guid:
-                asset_path = meta_path.with_suffix("")
+                asset_path = meta_path.with_suffix("")  # remove .meta
+                abs_path = str(asset_path)
                 rel_path = str(asset_path.relative_to(assets_dir))
+                stem = asset_path.stem
+
+                # Index by absolute path, relative path, and stem name
+                result[abs_path] = guid
                 result[rel_path] = guid
-                result[asset_path.stem] = guid
+                result[stem] = guid
 
     return result
 
