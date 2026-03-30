@@ -25,7 +25,7 @@ from core.prefab_patcher import (
     get_field_value,
     read_unity_yaml,
 )
-from core.llm_client import get_client, extract_json, OPENAI_MODEL
+from core.llm_client import get_client, extract_json, ANTHROPIC_MODEL as OPENAI_MODEL
 from integrations.git_manager import git_commit_files
 from integrations.discord_notifier import notify_discord
 
@@ -140,15 +140,16 @@ Asset contents:
 Return a JSON object with a "patches" array.
 """
 
-    response = client.responses.create(
+    response = client.messages.create(
         model=OPENAI_MODEL,
-        input=[
-            {"role": "system", "content": system_prompt},
+        max_tokens=8192,
+        system=system_prompt,
+        messages=[
             {"role": "user", "content": user_prompt},
         ]
     )
 
-    raw_text = response.output_text.strip()
+    raw_text = response.content[0].text.strip()
     json_text = extract_json(raw_text)
     data = json.loads(json_text)
     return data.get("patches", [])

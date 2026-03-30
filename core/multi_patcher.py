@@ -13,7 +13,7 @@ from core.llm_client import get_client
 from core.unity_scanner import find_relevant_files
 from core.proposal_validator import validate_patch_for_file as _default_validator
 from core.risk_classifier import classify_risk
-from core.llm_client import extract_json, OPENAI_MODEL
+from core.llm_client import extract_json, ANTHROPIC_MODEL as OPENAI_MODEL
 
 # All known script names (without .cs) for named-file extraction
 KNOWN_SCRIPTS = [
@@ -138,15 +138,16 @@ Relevant Unity logs:
 Return a JSON object with a "patches" array. Only include files that need changes.
 """
 
-    response = client.responses.create(
+    response = client.messages.create(
         model=OPENAI_MODEL,
-        input=[
-            {"role": "system", "content": system_prompt},
+        max_tokens=8192,
+        system=system_prompt,
+        messages=[
             {"role": "user", "content": user_prompt},
         ]
     )
 
-    raw_text = response.output_text.strip()
+    raw_text = response.content[0].text.strip()
     json_text = extract_json(raw_text)
     data = json.loads(json_text)
 

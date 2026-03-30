@@ -319,5 +319,22 @@
         "unity log contains strong error signal"
       ]
     }
+  },
+  {
+    "id": 21,
+    "task_id": 77,
+    "project_id": "paraelementals",
+    "file_path": "/Users/paceai1/Desktop/Unity/paraelementals/Assets/Scripts/Player/PlayerController.cs",
+    "new_content": "using UnityEngine;\nusing UnityEngine.InputSystem;\n\n[RequireComponent(typeof(Rigidbody2D))]\npublic class PlayerController : MonoBehaviour\n{\n    [Header(\"Movement\")]\n    [SerializeField] private float _moveSpeed = 5f;\n\n    private Rigidbody2D _rb;\n    private Vector2 _moveInput;\n    private Vector2 _lastMoveDirection = Vector2.down;\n\n    public Vector2 MoveInput => _moveInput;\n    public Vector2 LastMoveDirection => _lastMoveDirection;\n\n    private void Awake()\n    {\n        _rb = GetComponent<Rigidbody2D>();\n    }\n\n    private void Update()\n    {\n        _moveInput = Vector2.zero;\n\n        if (Keyboard.current != null)\n        {\n            if (Keyboard.current.wKey.isPressed) _moveInput.y += 1f;\n            if (Keyboard.current.sKey.isPressed) _moveInput.y -= 1f;\n            if (Keyboard.current.aKey.isPressed) _moveInput.x -= 1f;\n            if (Keyboard.current.dKey.isPressed) _moveInput.x += 1f;\n        }\n\n        _moveInput = _moveInput.normalized;\n\n        if (_moveInput.sqrMagnitude > 0.01f)\n        {\n            _lastMoveDirection = _moveInput;\n        }\n\n        Debug.Log(\"Move input: \" + _moveInput);\n    }\n\n    private void FixedUpdate()\n    {\n        _rb.linearVelocity = _moveInput * _moveSpeed;\n    }\n}\n",
+    "summary": "No changes required - file does not contain the referenced SideScrollPlayerController jump logic.",
+    "status": "applied",
+    "validation": {
+      "is_valid": true,
+      "errors": [],
+      "warnings": [
+        "Proposed patch is identical to the original file."
+      ],
+      "evidence_reasons": []
+    }
   }
 ]

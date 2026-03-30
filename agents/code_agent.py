@@ -203,7 +203,7 @@ def handle_patch_proposal(task, project_config):
         return {
             "changed_files": [],
             "summary": (
-                "LLM proposal requested, but OPENAI_API_KEY is not configured.\n\n"
+                "LLM proposal requested, but ANTHROPIC_API_KEY is not configured.\n\n"
                 f"Target file:\n{best_file}\n\nTop file preview:\n{best_preview[:3000]}"
             ),
         }

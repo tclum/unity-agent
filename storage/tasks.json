@@ -651,5 +651,32 @@
     "status": "done",
     "notes": "",
     "channel_id": 1485374241712111638
+  },
+  {
+    "id": 77,
+    "project_id": "paraelementals",
+    "title": "fix jump in SideScrollPlayerController \u2014 move UpdateGroundedState to run before jump input check so _isGrounded is accurate when space is pressed",
+    "type": "code",
+    "status": "done",
+    "notes": "",
+    "channel_id": 1485374241712111638
+  },
+  {
+    "id": 78,
+    "project_id": "paraelementals",
+    "title": "assign EnemyBaddie prefab to all EnemySpawnPoint components in the scene",
+    "type": "prefab",
+    "status": "done",
+    "notes": "",
+    "channel_id": 1485374241712111638
+  },
+  {
+    "id": 79,
+    "project_id": "paraelementals",
+    "title": "fix SideScrollEnemyController HandleDeath to call LevelManager.Instance.RegisterEnemyKill if LevelManager exists",
+    "type": "code",
+    "status": "done",
+    "notes": "",
+    "channel_id": 1485374241712111638
   }
 ]
