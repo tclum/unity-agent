@@ -4,6 +4,7 @@ from pathlib import Path
 
 from core.task_queue import add_task
 from core.project_manager import get_active_project
+from core.config_loader import load_project_config
 
 LOG_PATH = Path.home() / "Library/Logs/Unity/Editor.log"
 
@@ -21,6 +22,91 @@ POLL_INTERVAL = 10
 
 # Cooldown before the same error can trigger again (seconds)
 ERROR_COOLDOWN = 120
+
+# How often to scan for new PNG assets (seconds)
+PNG_SCAN_INTERVAL = 15
+
+
+def fix_png_meta_as_sprite(meta_path: Path) -> bool:
+    """
+    Ensure a PNG .meta file has textureType=8 (Sprite) and spriteMode=1 (Single).
+    Returns True if changes were made.
+    """
+    try:
+        content = meta_path.read_text(encoding="utf-8")
+        original = content
+
+        if "textureType: 0" in content:
+            content = content.replace("textureType: 0", "textureType: 8")
+        if "spriteMode: 0" in content:
+            content = content.replace("spriteMode: 0", "spriteMode: 1")
+
+        if content != original:
+            meta_path.write_text(content, encoding="utf-8")
+            return True
+    except Exception as e:
+        print(f"[PNGWatcher] Failed to fix meta for {meta_path}: {e}")
+    return False
+
+
+class PNGWatcher:
+    """
+    Watches Unity Art folders for new PNG files and automatically
+    sets their texture type to Sprite in the .meta file.
+    """
+    def __init__(self):
+        self._seen: set[str] = set()
+        self._running = False
+        self._thread: threading.Thread | None = None
+
+    def start(self, project_config: dict):
+        if self._running:
+            return
+        self._running = True
+        self._thread = threading.Thread(
+            target=self._run, args=(project_config,), daemon=True
+        )
+        self._thread.start()
+        print("[PNGWatcher] Started — watching for new PNG assets.")
+
+    def stop(self):
+        self._running = False
+
+    def _run(self, project_config: dict):
+        unity_root = Path(project_config["unity_project_path"])
+        art_dir = unity_root / "Assets" / "Art"
+
+        # Seed seen set with existing files on startup
+        if art_dir.exists():
+            for meta in art_dir.rglob("*.png.meta"):
+                self._seen.add(str(meta))
+
+        while self._running:
+            try:
+                self._check_for_new_pngs(art_dir)
+            except Exception as e:
+                print(f"[PNGWatcher] Error: {e}")
+            time.sleep(PNG_SCAN_INTERVAL)
+
+    def _check_for_new_pngs(self, art_dir: Path):
+        if not art_dir.exists():
+            return
+
+        for meta_path in art_dir.rglob("*.png.meta"):
+            meta_str = str(meta_path)
+            if meta_str in self._seen:
+                continue
+
+            # New PNG detected
+            self._seen.add(meta_str)
+            png_name = meta_path.stem  # removes .meta, leaves .png
+            print(f"[PNGWatcher] New PNG detected: {png_name}")
+
+            changed = fix_png_meta_as_sprite(meta_path)
+            if changed:
+                print(f"[PNGWatcher] Auto-fixed sprite import type for {png_name}")
+            else:
+                print(f"[PNGWatcher] {png_name} already configured as sprite")
 
 
 class LogWatcher:
@@ -84,7 +170,6 @@ class LogWatcher:
         if not project_id:
             return
 
-        # Extract a short context from the log line
         context = line.strip()[:120]
         task_title = f"auto: {signal} detected — {context}"
 
@@ -97,12 +182,18 @@ class LogWatcher:
         print(f"[LogWatcher] Auto-created task #{task['id']} for {signal}")
 
 
-_watcher = LogWatcher()
+_log_watcher = LogWatcher()
+_png_watcher = PNGWatcher()
 
 
 def start_log_watcher():
-    _watcher.start()
+    _log_watcher.start()
+
+
+def start_png_watcher(project_config: dict):
+    _png_watcher.start(project_config)
 
 
 def stop_log_watcher():
-    _watcher.stop()
+    _log_watcher.stop()
+    _png_watcher.stop()
