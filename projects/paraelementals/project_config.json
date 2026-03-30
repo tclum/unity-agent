@@ -1,0 +1,11 @@
+{
+  "name": "ParaElementals",
+  "unity_project_path": "/Users/paceai1/Desktop/Unity/paraelementals",
+  "allowed_paths": [
+    "Assets/Scripts",
+    "Assets/Art",
+    "Assets/Prefabs",
+    "Assets/ScriptableObjects"
+  ],
+  "protected_paths": ["Assets/Scenes", "ProjectSettings", "Packages"]
+}

@@ -282,5 +282,42 @@
         "unity log contains strong error signal"
       ]
     }
+  },
+  {
+    "id": 19,
+    "task_id": 75,
+    "project_id": "paraelementals",
+    "file_path": "/Users/paceai1/Desktop/Unity/paraelementals/Assets/Scripts/Combat/AttackHitbox.cs",
+    "new_content": "using System.Collections.Generic;\nusing UnityEngine;\n\n[RequireComponent(typeof(Collider2D))]\npublic class AttackHitbox : MonoBehaviour\n{\n    private Collider2D _collider;\n    private int _damage = 1;\n    private readonly HashSet<IDamageable> _hitTargets = new HashSet<IDamageable>();\n\n    private void Awake()\n    {\n        _collider = GetComponent<Collider2D>();\n        _collider.enabled = false;\n    }\n\n    public void SetDamage(int damage)\n    {\n        _damage = damage;\n    }\n\n    public void EnableHitbox()\n    {\n        _hitTargets.Clear();\n        _collider.enabled = true;\n        Debug.Log(\"Attack hitbox enabled\");\n    }\n\n    public void DisableHitbox()\n    {\n        _collider.enabled = false;\n        _hitTargets.Clear();\n    }\n\n    private void OnTriggerEnter2D(Collider2D other)\n    {\n        IDamageable damageable = other.GetComponent<IDamageable>();\n        if (damageable == null)\n            return;\n\n        if (_hitTargets.Contains(damageable))\n            return;\n\n        _hitTargets.Add(damageable);\n        damageable.TakeDamage(_damage);\n\n        Debug.Log(\"Hit \" + other.name + \" for \" + _damage);\n    }\n}",
+    "summary": "No changes needed in AttackHitbox.cs to address the NullReferenceException in HealthBarUI.Update as this script does not relate to HealthBarUI. The current file already safely initializes its fields. No patch is applied.",
+    "status": "applied",
+    "validation": {
+      "is_valid": true,
+      "errors": [],
+      "warnings": [
+        "Proposed patch is identical to the original file."
+      ],
+      "evidence_reasons": [
+        "task title matches patchable issue pattern",
+        "unity log contains strong error signal"
+      ]
+    }
+  },
+  {
+    "id": 20,
+    "task_id": 76,
+    "project_id": "paraelementals",
+    "file_path": "/Users/paceai1/Desktop/Unity/paraelementals/Assets/Scripts/Inventory/InventoryManager.cs",
+    "new_content": "using System;\nusing System.Collections.Generic;\nusing UnityEngine;\n\npublic class InventoryManager : MonoBehaviour\n{\n    [SerializeField] private int _maxSlots = 24;\n\n    private List<InventorySlot> _slots = new List<InventorySlot>();\n\n    public IReadOnlyList<InventorySlot> Slots => _slots;\n\n    public event Action InventoryChanged;\n\n    private void Awake()\n    {\n        for (int i = 0; i < _maxSlots; i++)\n        {\n            _slots.Add(new InventorySlot());\n        }\n    }\n\n    public bool AddItem(ItemData item, int amount)\n    {\n        if (item == null || amount <= 0)\n            return false;\n\n        int remaining = amount;\n\n        for (int i = 0; i < _slots.Count; i++)\n        {\n            InventorySlot slot = _slots[i];\n            if (slot.Item == item && slot.Quantity < item.MaxStack)\n            {\n                int space = item.MaxStack - slot.Quantity;\n                int toAdd = Mathf.Min(space, remaining);\n                slot.Quantity += toAdd;\n                remaining -= toAdd;\n\n                if (remaining <= 0)\n                {\n                    InventoryChanged?.Invoke();\n                    return true;\n                }\n                Debug.Log(\"Inventory + \" + item.DisplayName + \" x\" + amount);\n            }\n        }\n\n        for (int i = 0; i < _slots.Count; i++)\n        {\n            InventorySlot slot = _slots[i];\n            if (slot.IsEmpty)\n            {\n                int toAdd = Mathf.Min(item.MaxStack, remaining);\n                slot.Item = item;\n                slot.Quantity = toAdd;\n                remaining -= toAdd;\n\n                if (remaining <= 0)\n                {\n                    InventoryChanged?.Invoke();\n                    return true;\n                }\n            }\n        }\n\n        InventoryChanged?.Invoke();\n        return remaining == 0;\n    }\n\n    public bool RemoveItem(ItemData item, int amount)\n    {\n        if (!HasItem(item, amount))\n            return false;\n\n        int remaining = amount;\n\n        for (int i = 0; i < _slots.Count; i++)\n        {\n            InventorySlot slot = _slots[i];\n            if (slot.Item != item)\n                continue;\n\n            int toRemove = Mathf.Min(slot.Quantity, remaining);\n            slot.Quantity -= toRemove;\n            remaining -= toRemove;\n\n            if (slot.Quantity <= 0)\n            {\n                slot.Item = null;\n                slot.Quantity = 0;\n            }\n\n            if (remaining <= 0)\n            {\n                InventoryChanged?.Invoke();\n                return true;\n            }\n        }\n\n        InventoryChanged?.Invoke();\n        return true;\n    }\n\n    public bool HasItem(ItemData item, int amount)\n    {\n        if (item == null || amount <= 0)\n            return false;\n\n        int total = 0;\n        for (int i = 0; i < _slots.Count; i++)\n        {\n            if (_slots[i].Item == item)\n            {\n                total += _slots[i].Quantity;\n            }\n        }\n\n        return total >= amount;\n    }\n\n    public int GetItemCount(string itemId)\n    {\n        if (string.IsNullOrEmpty(itemId))\n            return 0;\n\n        int total = 0;\n\n        for (int i = 0; i < _slots.Count; i++)\n        {\n            InventorySlot slot = _slots[i];\n\n            if (slot.Item != null && slot.Item.ItemId == itemId)\n            {\n                total += slot.Quantity;\n            }\n        }\n\n        return total;\n    }\n\n    public int GetItemCount(ItemData item)\n    {\n        if (item == null)\n            return 0;\n\n        int total = 0;\n        for (int i = 0; i < _slots.Count; i++)\n        {\n            if (_slots[i].Item == item)\n            {\n                total += _slots[i].Quantity;\n            }\n        }\n\n        return total;\n    }\n}",
+    "summary": "No changes made, as the provided file does not contain the referenced Update method or HealthBarUI logic. Null reference issues likely originate in another script.",
+    "status": "applied",
+    "validation": {
+      "is_valid": true,
+      "errors": [],
+      "warnings": [],
+      "evidence_reasons": [
+        "unity log contains strong error signal"
+      ]
+    }
   }
 ]

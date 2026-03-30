@@ -11,7 +11,7 @@ import json
 
 from core.llm_client import get_client
 from core.unity_scanner import find_relevant_files
-from core.proposal_validator import validate_patch_for_file
+from core.proposal_validator import validate_patch_for_file as _default_validator
 from core.risk_classifier import classify_risk
 from core.llm_client import extract_json, OPENAI_MODEL
 
@@ -178,7 +178,19 @@ def validate_multi_file_patches(
             continue
 
         original = original_contents.get(file_path, "")
-        result = validate_patch_for_file(
+
+        # Use project-specific validator if injected
+        try:
+            import agents.code_agent as _ca
+            validator_fn = (
+                _ca._project_validator.validate_patch_for_file
+                if _ca._project_validator and hasattr(_ca._project_validator, 'validate_patch_for_file')
+                else _default_validator
+            )
+        except Exception:
+            validator_fn = _default_validator
+
+        result = validator_fn(
             file_path=file_path,
             original_text=original,
             proposed_text=new_content,

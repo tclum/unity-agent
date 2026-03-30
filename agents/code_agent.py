@@ -13,7 +13,18 @@ from core.proposal_store import add_proposal
 from core.diff_preview import build_diff_preview
 from core.llm_client import is_llm_available, generate_patch_proposal
 from core.scene_context_helper import get_scene_context_for_task
-from core.proposal_validator import validate_patch_for_file
+from core.proposal_validator import validate_patch_for_file as _default_validator
+import sys
+
+# Project-specific validator injected by orchestrator
+_project_validator = None
+
+
+def _validate_patch(file_path: str, original_text: str, proposed_text: str):
+    """Use project-specific validator if available, else default."""
+    if _project_validator is not None and hasattr(_project_validator, 'validate_patch_for_file'):
+        return _project_validator.validate_patch_for_file(file_path, original_text, proposed_text)
+    return _default_validator(file_path, original_text, proposed_text)
 from core.risk_classifier import classify_risk
 from core.proposal_applier import apply_proposal_file
 from core.multi_patcher import (
@@ -129,7 +140,7 @@ def _attempt_patch(task, best_file, original_content, filtered_log, scene_contex
     if not evidence_match:
         return {"status": "evidence_mismatch", "message": evidence_error}
 
-    validation = validate_patch_for_file(
+    validation = _validate_patch(
         file_path=best_file,
         original_text=original_content,
         proposed_text=new_content,
@@ -157,6 +168,14 @@ def handle_patch_proposal(task, project_config):
     keywords = extract_keywords(task["title"])
     files = find_relevant_files(project_config, keywords)
 
+    # Always prioritize explicitly named scripts from the task title
+    unity_root = Path(project_config["unity_project_path"])
+    all_scripts = [str(p) for p in (unity_root / "Assets").rglob("*.cs")]
+    named = extract_named_files(task["title"], all_scripts)
+    for f in named:
+        if f not in files:
+            files.insert(0, f)
+
     if not files:
         return None
 
@@ -165,10 +184,7 @@ def handle_patch_proposal(task, project_config):
     original_content = Path(best_file).read_text(encoding="utf-8")
 
     filtered_log = read_filtered_unity_log(
-        keywords=[
-            "ResultsUI", "Error", "Exception", "NullReference",
-            "ShowResults", "Hide", "ScoreSummaryText", "ResultsPanel",
-        ]
+        keywords=["Error", "Exception", "NullReference"] + keywords
     )
 
     scene_context = get_scene_context_for_task(project_config, task["title"])

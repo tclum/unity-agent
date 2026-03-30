@@ -10,12 +10,21 @@ from agents.prefab_agent import handle_task as handle_prefab_task
 from agents.qa_agent import review_task_result
 from integrations.git_manager import git_checkpoint
 from integrations.discord_notifier import send_message
-from core.proposal_validator import validate_patch_for_file
 
 
 def load_project_router(project_id: str):
     module_name = f"projects.{project_id}.task_router"
     return importlib.import_module(module_name)
+
+
+def load_project_validator(project_id: str):
+    """Load the project-specific proposal validator if it exists, else use default."""
+    try:
+        module_name = f"projects.{project_id}.proposal_validator"
+        return importlib.import_module(module_name)
+    except ModuleNotFoundError:
+        from core import proposal_validator
+        return proposal_validator
 
 
 def process_task(task: dict):
@@ -25,8 +34,12 @@ def process_task(task: dict):
     project_config = load_project_config(task["project_id"])
     router = load_project_router(task["project_id"])
 
+    # Inject project-specific validator into code_agent
+    import agents.code_agent as code_agent_module
+    validator = load_project_validator(task["project_id"])
+    code_agent_module._project_validator = validator
+
     inferred_type = router.classify_task(task["title"])
-    # Use explicit type if set by Discord command, fall back to classifier
     task_type = task["type"] if task["type"] not in ("general", None) else inferred_type
 
     plan = make_plan(task, project_config)
@@ -63,6 +76,19 @@ def process_task(task: dict):
 
     update_task_status(task["id"], "done")
     print(f"[Orchestrator] Completed task #{task['id']}")
+
+
+def run_orchestrator():
+    print("[Orchestrator] Started.")
+    while True:
+        task = get_next_task()
+        if task:
+            try:
+                process_task(task)
+            except Exception as e:
+                print(f"[Orchestrator] Error: {e}")
+                update_task_status(task["id"], "failed")
+        time.sleep(5)
 
 
 def run_orchestrator():

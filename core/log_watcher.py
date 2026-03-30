@@ -121,6 +121,11 @@ class LogWatcher:
         if self._running:
             return
         self._running = True
+
+        # Seed position at end of current log so we only catch NEW errors
+        if LOG_PATH.exists():
+            self._last_size = LOG_PATH.stat().st_size
+
         self._thread = threading.Thread(target=self._run, daemon=True)
         self._thread.start()
         print("[LogWatcher] Started — monitoring Unity log for errors.")
@@ -160,6 +165,17 @@ class LogWatcher:
     def _handle_error(self, signal: str, line: str):
         now = time.time()
 
+        # Skip generic errors with no useful file/object context
+        lower_line = line.lower()
+        if "object reference not set to an instance" in lower_line and \
+           "at " not in lower_line and "script" not in lower_line:
+            return
+
+        # Require minimum context length to be actionable
+        context = line.strip()
+        if len(context) < 60:
+            return
+
         with self._lock:
             last_seen = self._seen_errors.get(signal, 0)
             if now - last_seen < ERROR_COOLDOWN:
@@ -170,8 +186,7 @@ class LogWatcher:
         if not project_id:
             return
 
-        context = line.strip()[:120]
-        task_title = f"auto: {signal} detected — {context}"
+        task_title = f"auto: {signal} detected — {context[:120]}"
 
         task = add_task(
             project_id=project_id,

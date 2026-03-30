@@ -597,5 +597,59 @@
     "status": "done",
     "notes": "",
     "channel_id": 1485374241712111638
+  },
+  {
+    "id": 71,
+    "project_id": "ainaquest",
+    "title": "auto: NullReferenceException detected \u2014 NullReferenceException: Object reference not set to an instance of an object",
+    "type": "general",
+    "status": "failed",
+    "notes": "",
+    "channel_id": null
+  },
+  {
+    "id": 72,
+    "project_id": "ainaquest",
+    "title": "auto: NullReferenceException detected \u2014 NullReferenceException: Object reference not set to an instance of an object",
+    "type": "general",
+    "status": "failed",
+    "notes": "",
+    "channel_id": null
+  },
+  {
+    "id": 73,
+    "project_id": "ainaquest",
+    "title": "auto: NullReferenceException detected \u2014 NullReferenceException: Object reference not set to an instance of an object",
+    "type": "general",
+    "status": "failed",
+    "notes": "",
+    "channel_id": null
+  },
+  {
+    "id": 74,
+    "project_id": "ainaquest",
+    "title": "auto: NullReferenceException detected \u2014 NullReferenceException: Object reference not set to an instance of an object",
+    "type": "general",
+    "status": "failed",
+    "notes": "",
+    "channel_id": null
+  },
+  {
+    "id": 75,
+    "project_id": "paraelementals",
+    "title": "fix NullReferenceException in HealthBarUI.Update at line 11 \u2014 object reference not set",
+    "type": "code",
+    "status": "done",
+    "notes": "",
+    "channel_id": 1485374241712111638
+  },
+  {
+    "id": 76,
+    "project_id": "paraelementals",
+    "title": "add null checks to HealthBarUI Update method for playerHealth and slider fields",
+    "type": "code",
+    "status": "done",
+    "notes": "",
+    "channel_id": 1485374241712111638
   }
 ]
